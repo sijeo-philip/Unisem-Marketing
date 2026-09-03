@@ -1,0 +1,1085 @@
+{
+    "portfolio_version": "2026-09",
+
+    "modules": [
+
+        {
+            "id": "USE_8762_MINI",
+            "name": "USE_8762 MINI",
+            "family": "bluetooth_le",
+
+            "connectivity": {
+                "wifi": false,
+                "ble": true,
+                "bluetooth_classic": false
+            },
+
+            "wifi": {
+                "supported": false,
+                "generation": null,
+                "standards": [],
+                "bands": [],
+                "spatial_streams": null,
+                "mimo": null,
+                "max_phy_rate_mbps": null
+            },
+
+            "bluetooth": {
+                "supported": true,
+                "version": "5.0",
+                "ble": true,
+                "classic": false
+            },
+
+            "architecture": {
+                "type": "embedded_mcu",
+                "integrated_mcu": true,
+                "processor": null
+            },
+
+            "memory": {
+                "flash": "4 Mbit embedded Flash",
+                "sram": null
+            },
+
+            "host_interfaces": {
+                "wifi": [],
+                "bluetooth": []
+            },
+
+            "peripheral_interfaces": [
+                "UART",
+                "I2C",
+                "SPI"
+            ],
+
+            "embedded_features": {
+                "can": null,
+                "adc": null,
+                "capacitive_touch": null,
+                "bluetooth_audio": null
+            },
+
+            "mechanical": {
+                "width_mm": null,
+                "length_mm": null,
+                "height_mm": null
+            },
+
+            "operating_temperature": {
+                "minimum_c": -40,
+                "maximum_c": 105
+            },
+
+            "rf_highlight": "BLE RX sensitivity up to -98.5 dBm",
+
+            "positioning": {
+                "description": "Low-power embedded BLE for connected devices",
+                "tags": [
+                    "low_power",
+                    "compact"
+                ]
+            },
+
+            "applications": [
+                "Smart locks & access",
+                "Automotive controls",
+                "Meters & sensors",
+                "Wearables / peripherals"
+            ],
+
+            "choose_when":
+                "You need a compact, low-power BLE module with an embedded MCU for control and sensing."
+        },
+
+
+        {
+            "id": "USE_45",
+            "name": "USE_45",
+            "family": "bluetooth_le",
+
+            "connectivity": {
+                "wifi": false,
+                "ble": true,
+                "bluetooth_classic": false
+            },
+
+            "wifi": {
+                "supported": false,
+                "generation": null,
+                "standards": [],
+                "bands": [],
+                "spatial_streams": null,
+                "mimo": null,
+                "max_phy_rate_mbps": null
+            },
+
+            "bluetooth": {
+                "supported": true,
+                "version": "5.3",
+                "ble": true,
+                "classic": false
+            },
+
+            "architecture": {
+                "type": "embedded_mcu",
+                "integrated_mcu": true,
+                "processor": "96 MHz Arm Cortex-M33"
+            },
+
+            "memory": {
+                "flash": "Up to 1 MB Flash",
+                "sram": "128 KB SRAM"
+            },
+
+            "host_interfaces": {
+                "wifi": [],
+                "bluetooth": []
+            },
+
+            "peripheral_interfaces": [
+                "UART",
+                "I2C",
+                "SPI",
+                "CAN"
+            ],
+
+            "embedded_features": {
+                "can": true,
+                "adc": null,
+                "capacitive_touch": null,
+                "bluetooth_audio": null
+            },
+
+            "mechanical": {
+                "width_mm": null,
+                "length_mm": null,
+                "height_mm": null
+            },
+
+            "operating_temperature": {
+                "minimum_c": null,
+                "maximum_c": null
+            },
+
+            "supply":
+                "DC/DC: 1.8 V to 3.6 V",
+
+            "rf_highlight":
+                "Programmable TX power up to +10 dBm",
+
+            "positioning": {
+                "description":
+                    "Secure BLE platform for automotive & industrial applications",
+
+                "tags": [
+                    "secure",
+                    "automotive",
+                    "industrial"
+                ]
+            },
+
+            "applications": [
+                "Secure car access",
+                "Keyless entry / positioning",
+                "Wireless BMS",
+                "Factory & building automation"
+            ],
+
+            "choose_when":
+                "You need secure BLE 5.3 for car access, keyless entry, wireless BMS or industrial connectivity."
+        },
+
+
+        {
+            "id": "USE_8763_M",
+            "name": "USE_8763_M",
+            "family": "bluetooth_ble",
+
+            "connectivity": {
+                "wifi": false,
+                "ble": true,
+                "bluetooth_classic": true
+            },
+
+            "wifi": {
+                "supported": false,
+                "generation": null,
+                "standards": [],
+                "bands": [],
+                "spatial_streams": null,
+                "mimo": null,
+                "max_phy_rate_mbps": null
+            },
+
+            "bluetooth": {
+                "supported": true,
+                "version": "5.3",
+                "ble": true,
+                "classic": true
+            },
+
+            "architecture": {
+                "type": "embedded",
+                "integrated_mcu": null,
+                "processor": null
+            },
+
+            "memory": {
+                "flash": "4 MB Flash",
+                "sram": null
+            },
+
+            "host_interfaces": {
+                "wifi": [],
+                "bluetooth": []
+            },
+
+            "peripheral_interfaces": [
+                "UART",
+                "I2C",
+                "SPI"
+            ],
+
+            "embedded_features": {
+                "can": null,
+                "adc": null,
+                "capacitive_touch": null,
+                "bluetooth_audio": true
+            },
+
+            "mechanical": {
+                "width_mm": null,
+                "length_mm": null,
+                "height_mm": null
+            },
+
+            "operating_temperature": {
+                "minimum_c": -30,
+                "maximum_c": 85
+            },
+
+            "supply":
+                "VBAT 3.0 to 4.5 V",
+
+            "positioning": {
+                "description":
+                    "Simplified BT/BLE audio platform",
+
+                "tags": [
+                    "audio",
+                    "control"
+                ]
+            },
+
+            "applications": [
+                "Automotive controls",
+                "Audio receiver / transmitter",
+                "Connected accessories",
+                "Human-machine interfaces"
+            ],
+
+            "choose_when":
+                "You need the 8763 Bluetooth/audio capability with a simpler host and power interface."
+        },
+
+
+        {
+            "id": "USE_8188_FN",
+            "name": "USE_8188_FN",
+            "family": "wifi",
+
+            "connectivity": {
+                "wifi": true,
+                "ble": false,
+                "bluetooth_classic": false
+            },
+
+            "wifi": {
+                "supported": true,
+                "generation": 4,
+
+                "standards": [
+                    "802.11b",
+                    "802.11g",
+                    "802.11n"
+                ],
+
+                "bands": [
+                    "2.4GHz"
+                ],
+
+                "spatial_streams": 1,
+                "mimo": "1x1",
+                "max_phy_rate_mbps": 72.2
+            },
+
+            "bluetooth": {
+                "supported": false,
+                "version": null,
+                "ble": false,
+                "classic": false
+            },
+
+            "architecture": {
+                "type": "host_based",
+                "integrated_mcu": false,
+                "processor": null
+            },
+
+            "host_interfaces": {
+                "wifi": [
+                    "USB"
+                ],
+
+                "bluetooth": []
+            },
+
+            "peripheral_interfaces": [],
+
+            "embedded_features": {
+                "can": null,
+                "adc": null,
+                "capacitive_touch": null,
+                "bluetooth_audio": null
+            },
+
+            "mechanical": {
+                "width_mm": 12.2,
+                "length_mm": 13.0,
+                "height_mm": 1.5
+            },
+
+            "operating_temperature": {
+                "minimum_c": 0,
+                "maximum_c": 70
+            },
+
+            "os_support": [
+                "Android",
+                "Linux",
+                "Windows"
+            ],
+
+            "positioning": {
+                "description":
+                    "8188 family footprint / integration option",
+
+                "tags": [
+                    "compact",
+                    "usb_wifi"
+                ]
+            },
+
+            "applications": [
+                "IP cameras",
+                "Video products",
+                "Smart appliances",
+                "Embedded host systems"
+            ],
+
+            "choose_when":
+                "You need the 8188 USB Wi-Fi platform and want to evaluate a module variant for your hardware."
+        },
+
+
+        {
+            "id": "USE_8189",
+            "name": "USE_8189",
+            "family": "wifi",
+
+            "connectivity": {
+                "wifi": true,
+                "ble": false,
+                "bluetooth_classic": false
+            },
+
+            "wifi": {
+                "supported": true,
+                "generation": 4,
+
+                "standards": [
+                    "802.11b",
+                    "802.11g",
+                    "802.11n"
+                ],
+
+                "bands": [
+                    "2.4GHz"
+                ],
+
+                "spatial_streams": 1,
+                "mimo": "1x1",
+                "max_phy_rate_mbps": 72.2
+            },
+
+            "bluetooth": {
+                "supported": false,
+                "version": null,
+                "ble": false,
+                "classic": false
+            },
+
+            "architecture": {
+                "type": "host_based",
+                "integrated_mcu": false,
+                "processor": null
+            },
+
+            "host_interfaces": {
+                "wifi": [
+                    "SDIO"
+                ],
+
+                "bluetooth": []
+            },
+
+            "peripheral_interfaces": [],
+
+            "embedded_features": {
+                "can": null,
+                "adc": null,
+                "capacitive_touch": null,
+                "bluetooth_audio": null
+            },
+
+            "mechanical": {
+                "width_mm": 12,
+                "length_mm": 12,
+                "height_mm": 1.8
+            },
+
+            "operating_temperature": {
+                "minimum_c": 0,
+                "maximum_c": 70
+            },
+
+            "positioning": {
+                "description":
+                    "Compact SDIO Wi-Fi for host processors",
+
+                "tags": [
+                    "compact",
+                    "sdio_wifi"
+                ]
+            },
+
+            "applications": [
+                "Cameras",
+                "Displays",
+                "Linux/Android devices",
+                "Compact IoT gateways"
+            ],
+
+            "choose_when":
+                "Your application processor uses SDIO and needs a very compact 2.4 GHz Wi-Fi module."
+        },
+
+
+        {
+            "id": "USE_8720_CF",
+            "name": "USE_8720_CF",
+            "family": "wifi_ble",
+
+            "connectivity": {
+                "wifi": true,
+                "ble": true,
+                "bluetooth_classic": false
+            },
+
+            "wifi": {
+                "supported": true,
+                "generation": 4,
+
+                "standards": [
+                    "802.11b",
+                    "802.11g",
+                    "802.11n"
+                ],
+
+                "bands": [
+                    "2.4GHz"
+                ],
+
+                "spatial_streams": 1,
+                "mimo": "1x1",
+                "max_phy_rate_mbps": null
+            },
+
+            "bluetooth": {
+                "supported": true,
+                "version": "4.2",
+                "ble": true,
+                "classic": false
+            },
+
+            "architecture": {
+                "type": "embedded_mcu",
+                "integrated_mcu": true,
+                "processor": "Real-M300 (KM4), up to 100 MHz"
+            },
+
+            "host_interfaces": {
+                "wifi": [],
+                "bluetooth": []
+            },
+
+            "peripheral_interfaces": [
+                "UART",
+                "I2C",
+                "SDIO",
+                "SPI",
+                "PWM"
+            ],
+
+            "embedded_features": {
+                "can": null,
+                "adc": null,
+                "capacitive_touch": null,
+                "bluetooth_audio": null
+            },
+
+            "mechanical": {
+                "width_mm": null,
+                "length_mm": null,
+                "height_mm": null
+            },
+
+            "operating_temperature": {
+                "minimum_c": -40,
+                "maximum_c": 105
+            },
+
+            "positioning": {
+                "description":
+                    "Cost-optimized embedded IoT connectivity",
+
+                "tags": [
+                    "cost_optimized",
+                    "embedded_iot",
+                    "industrial_temperature"
+                ]
+            },
+
+            "applications": [
+                "Energy metering",
+                "Smart home",
+                "Industrial IoT",
+                "Connected appliances"
+            ],
+
+            "choose_when":
+                "You need an embedded Wi-Fi + BLE solution and 2.4 GHz connectivity is sufficient."
+        },
+
+
+        {
+            "id": "USE_8720_DF",
+            "name": "USE_8720_DF",
+            "family": "wifi_ble",
+
+            "connectivity": {
+                "wifi": true,
+                "ble": true,
+                "bluetooth_classic": false
+            },
+
+            "wifi": {
+                "supported": true,
+                "generation": 4,
+
+                "standards": [
+                    "802.11a",
+                    "802.11b",
+                    "802.11g",
+                    "802.11n"
+                ],
+
+                "bands": [
+                    "2.4GHz",
+                    "5GHz"
+                ],
+
+                "spatial_streams": 1,
+                "mimo": "1x1",
+                "max_phy_rate_mbps": null
+            },
+
+            "bluetooth": {
+                "supported": true,
+                "version": "5.0",
+                "ble": true,
+                "classic": false
+            },
+
+            "architecture": {
+                "type": "embedded_mcu",
+                "integrated_mcu": true,
+                "processor": "Dual-core KM4 + KM0"
+            },
+
+            "memory": {
+                "flash": "4 MB embedded Flash",
+                "sram": null
+            },
+
+            "host_interfaces": {
+                "wifi": [],
+                "bluetooth": []
+            },
+
+            "peripheral_interfaces": [
+                "UART",
+                "I2C",
+                "SPI",
+                "SDIO",
+                "USB"
+            ],
+
+            "embedded_features": {
+                "can": null,
+                "adc": null,
+                "capacitive_touch": null,
+                "bluetooth_audio": null
+            },
+
+            "mechanical": {
+                "width_mm": 24,
+                "length_mm": 16,
+                "height_mm": 2.3
+            },
+
+            "operating_temperature": {
+                "minimum_c": -40,
+                "maximum_c": 105
+            },
+
+            "positioning": {
+                "description":
+                    "General-purpose dual-band embedded platform",
+
+                "tags": [
+                    "dual_band",
+                    "general_purpose",
+                    "industrial_temperature"
+                ]
+            },
+
+            "applications": [
+                "Smart appliances",
+                "Industrial controllers",
+                "Energy gateways",
+                "Connected displays"
+            ],
+
+            "choose_when":
+                "You need robust dual-band Wi-Fi + BLE with integrated processing and broad peripheral support."
+        },
+
+
+        {
+            "id": "USE_8721",
+            "name": "USE_8721",
+            "family": "wifi_ble",
+
+            "connectivity": {
+                "wifi": true,
+                "ble": true,
+                "bluetooth_classic": false
+            },
+
+            "wifi": {
+                "supported": true,
+                "generation": 4,
+
+                "standards": [
+                    "802.11a",
+                    "802.11b",
+                    "802.11g",
+                    "802.11n"
+                ],
+
+                "bands": [
+                    "2.4GHz",
+                    "5GHz"
+                ],
+
+                "spatial_streams": 1,
+                "mimo": "1x1",
+                "max_phy_rate_mbps": null
+            },
+
+            "bluetooth": {
+                "supported": true,
+                "version": "5.0",
+                "ble": true,
+                "classic": false
+            },
+
+            "architecture": {
+                "type": "embedded_mcu",
+                "integrated_mcu": true,
+                "processor": "Dual-core KM4 + KM0"
+            },
+
+            "memory": {
+                "flash": "4 MB embedded Flash (MCM)",
+                "sram": null
+            },
+
+            "host_interfaces": {
+                "wifi": [],
+                "bluetooth": []
+            },
+
+            "peripheral_interfaces": [
+                "UART",
+                "I2C",
+                "SPI",
+                "SDIO",
+                "USB"
+            ],
+
+            "embedded_features": {
+                "can": null,
+                "adc": true,
+                "capacitive_touch": true,
+                "bluetooth_audio": null
+            },
+
+            "mechanical": {
+                "width_mm": 16,
+                "length_mm": 24,
+                "height_mm": null
+            },
+
+            "operating_temperature": {
+                "minimum_c": -40,
+                "maximum_c": 105
+            },
+
+            "positioning": {
+                "description":
+                    "Richer peripherals for embedded applications",
+
+                "tags": [
+                    "feature_rich",
+                    "dual_band",
+                    "industrial_temperature"
+                ]
+            },
+
+            "applications": [
+                "Smart HMI",
+                "Connected appliances",
+                "Industrial IoT",
+                "Feature-rich controllers"
+            ],
+
+            "choose_when":
+                "You need dual-band Wi-Fi + BLE plus richer analog, touch and peripheral capability."
+        },
+
+
+        {
+            "id": "USE_8733",
+            "name": "USE_8733",
+            "family": "wifi_bluetooth",
+
+            "connectivity": {
+                "wifi": true,
+                "ble": true,
+                "bluetooth_classic": true
+            },
+
+            "wifi": {
+                "supported": true,
+                "generation": 4,
+
+                "standards": [
+                    "802.11a",
+                    "802.11b",
+                    "802.11g",
+                    "802.11n"
+                ],
+
+                "bands": [
+                    "2.4GHz",
+                    "5GHz"
+                ],
+
+                "spatial_streams": 1,
+                "mimo": "1x1",
+                "max_phy_rate_mbps": 150
+            },
+
+            "bluetooth": {
+                "supported": true,
+                "version": "5.2",
+                "ble": true,
+                "classic": true
+            },
+
+            "architecture": {
+                "type": "host_based",
+                "integrated_mcu": false,
+                "processor": null
+            },
+
+            "host_interfaces": {
+                "wifi": [
+                    "USB"
+                ],
+
+                "bluetooth": [
+                    "USB"
+                ]
+            },
+
+            "peripheral_interfaces": [],
+
+            "embedded_features": {
+                "can": null,
+                "adc": null,
+                "capacitive_touch": null,
+                "bluetooth_audio": null
+            },
+
+            "mechanical": {
+                "width_mm": 12.2,
+                "length_mm": 12.9,
+                "height_mm": 2.37
+            },
+
+            "operating_temperature": {
+                "minimum_c": 0,
+                "maximum_c": 70
+            },
+
+            "positioning": {
+                "description":
+                    "Compact USB host combo",
+
+                "tags": [
+                    "compact",
+                    "usb_combo",
+                    "dual_band"
+                ]
+            },
+
+            "applications": [
+                "Infotainment",
+                "Cameras & displays",
+                "Media devices",
+                "Embedded Linux systems"
+            ],
+
+            "choose_when":
+                "Your host needs both dual-band Wi-Fi and Classic Bluetooth/BLE through a compact USB interface."
+        },
+
+
+        {
+            "id": "USE_8851",
+            "name": "USE_8851",
+            "family": "wifi6_bluetooth",
+
+            "connectivity": {
+                "wifi": true,
+                "ble": true,
+                "bluetooth_classic": true
+            },
+
+            "wifi": {
+                "supported": true,
+                "generation": 6,
+
+                "standards": [
+                    "802.11a",
+                    "802.11b",
+                    "802.11g",
+                    "802.11n",
+                    "802.11ac",
+                    "802.11ax"
+                ],
+
+                "bands": [
+                    "2.4GHz",
+                    "5GHz"
+                ],
+
+                "spatial_streams": 1,
+                "mimo": "1x1",
+                "max_phy_rate_mbps": 600
+            },
+
+            "bluetooth": {
+                "supported": true,
+                "version": "5.3",
+                "ble": true,
+                "classic": true
+            },
+
+            "architecture": {
+                "type": "host_based",
+                "integrated_mcu": false,
+                "processor": null
+            },
+
+            "host_interfaces": {
+                "wifi": [
+                    "PCIe"
+                ],
+
+                "bluetooth": [
+                    "USB"
+                ]
+            },
+
+            "peripheral_interfaces": [],
+
+            "embedded_features": {
+                "can": null,
+                "adc": null,
+                "capacitive_touch": null,
+                "bluetooth_audio": null
+            },
+
+            "mechanical": {
+                "width_mm": 12,
+                "length_mm": 16,
+                "height_mm": 1.95
+            },
+
+            "operating_temperature": {
+                "minimum_c": -10,
+                "maximum_c": 70
+            },
+
+            "positioning": {
+                "description":
+                    "Compact high-speed Wi-Fi 6 combo",
+
+                "tags": [
+                    "compact",
+                    "high_performance",
+                    "wifi6"
+                ]
+            },
+
+            "applications": [
+                "Infotainment",
+                "High-speed gateways",
+                "Smart displays",
+                "Edge computing devices"
+            ],
+
+            "choose_when":
+                "You need compact Wi-Fi 6 performance with Bluetooth and a PCIe-capable host."
+        },
+
+
+        {
+            "id": "USE_8852",
+            "name": "USE_8852",
+            "family": "wifi6_bluetooth",
+
+            "connectivity": {
+                "wifi": true,
+                "ble": true,
+                "bluetooth_classic": true
+            },
+
+            "wifi": {
+                "supported": true,
+                "generation": 6,
+
+                "standards": [
+                    "802.11a",
+                    "802.11b",
+                    "802.11g",
+                    "802.11n",
+                    "802.11ac",
+                    "802.11ax"
+                ],
+
+                "bands": [
+                    "2.4GHz",
+                    "5GHz"
+                ],
+
+                "spatial_streams": 2,
+                "mimo": "2x2",
+
+                "max_phy_rate_mbps": null,
+
+                "max_channel_bandwidth_mhz": 80
+            },
+
+            "bluetooth": {
+                "supported": true,
+                "version": "5.4",
+                "ble": true,
+                "classic": true
+            },
+
+            "architecture": {
+                "type": "host_based",
+                "integrated_mcu": false,
+                "processor": null
+            },
+
+            "host_interfaces": {
+                "wifi": [
+                    "PCIe"
+                ],
+
+                "bluetooth": [
+                    "USB"
+                ]
+            },
+
+            "peripheral_interfaces": [],
+
+            "embedded_features": {
+                "can": null,
+                "adc": null,
+                "capacitive_touch": null,
+                "bluetooth_audio": null
+            },
+
+            "mechanical": {
+                "width_mm": 22,
+                "length_mm": 30,
+                "height_mm": 2.2
+            },
+
+            "operating_temperature": {
+                "minimum_c": 0,
+                "maximum_c": 70
+            },
+
+            "positioning": {
+                "description":
+                    "Highest-performance module in current portfolio",
+
+                "tags": [
+                    "high_performance",
+                    "wifi6",
+                    "2x2_mimo"
+                ]
+            },
+
+            "applications": [
+                "High-performance infotainment",
+                "Video / media systems",
+                "Gateways",
+                "Compute platforms"
+            ],
+
+            "choose_when":
+                "You need 2x2 Wi-Fi 6 throughput, MIMO performance and the latest Bluetooth option in this range."
+        }
+
+    ]
+}

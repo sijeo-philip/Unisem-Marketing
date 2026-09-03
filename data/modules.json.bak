@@ -1,0 +1,77 @@
+{
+	"portfolio_version": "2026-09",
+	"modules": [
+	{
+		"id": "USE_8852",
+		"name": "USE_8852",
+		
+		"family": "wifi6_bluetooth",
+		
+		"connectivity": {
+			"wifi": true,
+			"ble": true,
+			"bluetooth_classic": true
+		},
+		
+		"wifi": {
+			"supported": true,
+			"generation": 6,
+			"standards": [
+					"802.11a",
+					"802.11b",
+					"802.11g",
+					"802.11n",
+					"802.11ac",
+					"802.11ax"
+					],
+			"bands": [
+				"2.4GHz",
+				"5GHz"
+			],
+			"spatial_streams": 2,
+			"mimo": "2x2",
+			"max_channel_bandwidth_mhz": 80
+		},
+		"bluetooth": {
+			"supported": true,
+			"version": "5.4",
+			"ble": true,
+			"classic": true
+		},
+		"architecture": {
+			"type": "host_based"
+		},
+		"host_interfaces": {
+			"wifi": [
+			"PCIe"
+			],
+			"bluetooth": [
+				"USB"
+			]
+		},
+		"mechanical": {
+			"width_mm": 22,
+			"length_mm": 30,
+			"height_mm": 2.2
+		},
+		
+		"operating_temperature": {
+			"minimum_c": 0,
+			"maximum_c": 70
+		},
+		
+		"positioning": {
+			"performance_class": "high",
+			"description": "Highest-performance module in current portfolio"
+		},
+		
+		"applications": [
+			"High-Performance infotainment",
+			"video / media system",
+			"Gateways",
+			"Compute Platforms"
+			],
+			"choose_when": "2x2 Wi-Fi throughput, MIMO performance and latest Bluetooth option in this range are required"
+		}
+	]
+}
