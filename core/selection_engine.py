@@ -35,6 +35,17 @@ def _preference_mismatch(result, message):
     """
     result["preference_notes"].append(message)
     
+def _preference_penalty(result, points, message):
+    """
+    Apply a small ranking penalty.
+    This never makes a module technically incompatible
+    It is used to favour the simplest module that
+    satifies the customer's actual requirement.
+    """
+    
+    result["preference_score"] -= points
+    result["preference_notes"].append(message)
+    
 def _check_boolean_capability( result, required, module_value, pass_message, fail_message, unknown_message):
     """
     Evaluate a Boolen hard requirement.
@@ -174,6 +185,9 @@ def _check_peripheral_interface(result, required, module, interface):
         _fail(result, f"Customer requires {interface}, "
               f"but it is not listed as a supported "
               f"interface for this module." )
+              
+              
+
 
 def evaluate_module(
     requirement,
@@ -666,9 +680,6 @@ def evaluate_module(
     # High performance
     # =====================================================
 
-        # =====================================================
-    # SOFT PREFERENCES
-    # =====================================================
 
     tags = set(module.get("positioning",{}).get("tags",[]))
 
@@ -797,6 +808,57 @@ def evaluate_module(
         else:
 
             _clarify(result, "Bluetooth audio capability requires technical confirmation." )
+            
+            
+    # =====================================================
+    # SOFT HEURISTIC:
+    # Prefer the minimum sufficient wireless capability
+    # =====================================================
+
+    customer_needs_wifi = (customer_connectivity["wifi_required"])
+    customer_needs_ble = (customer_connectivity["ble_required"])
+    customer_needs_classic = (customer_connectivity["bluetooth_classic_required"])
+    module_has_wifi = (module_connectivity.get("wifi") is True)
+    module_has_ble = (module_connectivity.get("ble") is True)
+    module_has_classic = (module_connectivity.get("bluetooth_classic") is True)
+
+    # -----------------------------------------------------
+    # Customer doesn't need Wi-Fi but module contains it
+    # -----------------------------------------------------
+
+    if (not customer_needs_wifi and module_has_wifi):
+        _preference_penalty(result, 2, "Module includes Wi-Fi although the customer does not require Wi-Fi.")
+
+    # -----------------------------------------------------
+    # Customer needs no Bluetooth capability
+    # -----------------------------------------------------
+
+    if (not customer_needs_ble and not customer_needs_classic and (module_has_ble or module_has_classic)):
+        _preference_penalty(result, 2, "Module includes Bluetooth capability although the customer only requires Wi-Fi.")
+
+    # -----------------------------------------------------
+    # BLE required but Classic Bluetooth is unnecessary
+    # -----------------------------------------------------
+
+    elif (customer_needs_ble and not customer_needs_classic and module_has_classic):
+        _preference_penalty(result, 1, "Module also includes Classic Bluetooth, which is not required.")
+        
+        
+    # =====================================================
+    # SOFT HEURISTIC:
+    # Rich embedded peripherals
+    # =====================================================
+
+    adc_required = requirement["embedded_features"]["adc_required"]
+
+    touch_required = requirement["embedded_features"]["capacitive_touch_required"]
+
+    module_features = module.get("embedded_features", {})
+    module_has_adc = (module_features.get("adc") is True)
+    module_has_touch = (module_features.get("capacitive_touch") is True)
+
+    if (not adc_required and not touch_required and (module_has_adc or module_has_touch)):
+        _preference_penalty(result,1,"Module includes richer embedded peripherals that are not required by this  application.")
     # =====================================================
     # FINAL STATUS
     # =====================================================
