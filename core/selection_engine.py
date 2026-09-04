@@ -28,12 +28,14 @@ def _preference_match(result, points, message):
     """
     result["preference_score"] += points
     result["preference_notes"].append(message)
+    result["preference_matches"].append(message)
     
 def _preference_mismatch(result, message):
     """
     Record a soft preference that was not matched.
     """
     result["preference_notes"].append(message)
+    result["preference_tradeoffs"].append(message)
     
 def _preference_penalty(result, points, message):
     """
@@ -45,6 +47,8 @@ def _preference_penalty(result, points, message):
     
     result["preference_score"] -= points
     result["preference_notes"].append(message)
+    result["preference_tradeoffs"].append(message)
+    
     
 def _check_boolean_capability( result, required, module_value, pass_message, fail_message, unknown_message):
     """
@@ -189,10 +193,7 @@ def _check_peripheral_interface(result, required, module, interface):
               
 
 
-def evaluate_module(
-    requirement,
-    module
-):
+def evaluate_module(requirement,module):
     """
     Evaluate one Unisem module against one customer
     requirement.
@@ -224,7 +225,11 @@ def evaluate_module(
 
         "preference_score": 0,
 
-        "preference_notes": []
+        "preference_notes": [], 
+        
+        "preference_matches": [],
+        
+        "preference_tradeoffs": []
     }
 
     # =====================================================
