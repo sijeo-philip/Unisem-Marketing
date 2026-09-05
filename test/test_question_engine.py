@@ -1,0 +1,184 @@
+
+import json
+import sys
+
+from pathlib import Path
+
+BASE_DIR = (Path(__file__).resolve().parent.parent)
+sys.path.insert(0, str(BASE_DIR))
+
+from core.question_engine import (QuestionSession,QuestionTreeError)
+from core.selection_engine import (evaluate_portfolio)
+from core.recommendation_report import (build_recommendation_report)
+
+with open(BASE_DIR/ "data"/ "question_tree.json", "r", encoding="utf-8") as file:
+    question_tree = json.load(file)
+with open(BASE_DIR/ "data"/ "modules.json", "r", encoding="utf-8") as file:
+    module_database = json.load(file)
+
+modules = module_database["modules"]
+
+print()
+print("=" * 72)
+print("TEST 1 - GUIDED WI-FI 6 SELECTION")
+print("=" * 72)
+
+session = QuestionSession(question_tree)
+question = (session.get_current_question())
+
+assert (question["id"] == "Q_CONNECTIVITY")
+print()
+print(question["text"])
+
+# Wi-Fi + Bluetooth
+question = session.answer("wifi_bt")
+assert (question["id"] == "Q_WIFI_BAND")
+
+# 5 GHz required
+question = session.answer(True)
+assert (question["id"] == "Q_WIFI_GENERATION")
+
+# Wi-Fi 6 required
+question = session.answer(True)
+
+assert (question["id"] == "Q_WIFI6_MIMO")
+
+# 2x2 NOT required
+question = session.answer(False)
+
+assert (question["id"] == "Q_ARCHITECTURE")
+
+# Host-based
+question = session.answer("host_based")
+
+assert (question["id"] == "Q_HOST_INTERFACE")
+
+# PCIe and USB available
+question = session.answer(["pcie", "usb"])
+
+assert (question is None)
+
+assert (session.is_complete())
+
+requirement = (session.get_requirement())
+
+assert (requirement["connectivity"]["wifi_required"] is True)
+assert (requirement["connectivity"]["ble_required"] is True)
+assert (requirement["connectivity"]["bluetooth_classic_required"] is True)
+assert (requirement["wifi"]["band_5ghz_required"] is True)
+assert (requirement["wifi"]["wifi6_required"] is True)
+assert (requirement["wifi"]["mimo_2x2_required"] is False)
+assert (requirement["interfaces"]["pcie_available"] is True)
+assert (requirement["interfaces"]["usb_available"] is True)
+assert (requirement["interfaces"]["sdio_available"] is False)
+
+
+results = evaluate_portfolio(requirement, modules)
+report = build_recommendation_report(requirement,results,modules)
+
+
+assert (report["decision"] == "RECOMMEND")
+assert (report["primary"]["module_id"] == "USE_8851")
+
+print()
+print("Primary recommendation:",report["primary"]["module_name"])
+print("Decision:",report["decision"])
+print()
+print("TEST 1 PASSED")
+
+print()
+print("=" * 72)
+print("TEST 2 - GUIDED FEATURE-RICH EMBEDDED SELECTION")
+print("=" * 72)
+
+session = QuestionSession(question_tree)
+session.answer("wifi_ble")
+session.answer(True)
+session.answer(False)
+session.answer("embedded")
+session.answer("both")
+
+assert (session.is_complete())
+requirement = (session.get_requirement())
+
+results = evaluate_portfolio(requirement,modules)
+report = build_recommendation_report(requirement, results, modules)
+
+assert (report["primary"]["module_id"] == "USE_8721")
+
+print()
+print("Primary recommendation:", report["primary"]["module_name"])
+print()
+print("TEST 2 PASSED")
+
+
+print()
+print("=" * 72)
+print("TEST 3 - UNKNOWN HOST INTERFACE")
+print("=" * 72)
+
+session = QuestionSession(question_tree)
+session.answer("wifi_bt")
+
+session.answer(True)
+session.answer(True)
+session.answer(False)
+session.answer("host_based")
+
+session.answer(["unknown"])
+assert (session.is_complete())
+requirement = (session.get_requirement())
+
+results = evaluate_portfolio(requirement, modules)
+report = build_recommendation_report(requirement,results,modules)
+
+assert (report["decision"] == "CONFIRM_BEFORE_RECOMMENDING")
+print()
+print("Decision:",report["decision"])
+
+if report["primary"]:
+    print("Provisional module:", report["primary"]["module_name"])
+    print()
+    print("Confirm:")
+
+    for clarification in report["primary"]["clarifications"]:
+        print("  ?",clarification)
+
+print()
+print("TEST 3 PASSED")
+
+
+print()
+print("=" * 72)
+print("TEST 4 - INVALID MULTIPLE CHOICE")
+print("=" * 72)
+
+session = QuestionSession(question_tree)
+session.answer("wifi_only")
+session.answer(False)
+session.answer(False)
+session.answer("host_based")
+try:
+    session.answer(["usb","unknown"])
+    raise AssertionError("Expected QuestionTreeError was not raised.")
+except QuestionTreeError as error:
+    print()
+    print("Correctly rejected invalid answer:")
+    print(error)
+print()
+print("TEST 4 PASSED")
+
+print()
+print("QUESTION HISTORY EXAMPLE")
+print("========================")
+session = QuestionSession(question_tree)
+session.answer("wifi_bt")
+session.answer(True)
+session.answer(True)
+session.answer(False)
+session.answer("host_based")
+session.answer(["pcie", "usb"])
+for index, item in enumerate(session.get_history(), start=1):
+    print()
+    print(f"{index}.",item["question"])
+    print("   Answer:",item["answer"])
