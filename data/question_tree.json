@@ -1,5 +1,5 @@
 {
-    "version": "1.0",
+    "version": "1.1",
 
     "start_question": "Q_CONNECTIVITY",
 
@@ -15,32 +15,101 @@
 
                 {
                     "id": "ble_only",
+
                     "label": "Bluetooth LE only",
+
+                    "set": {
+                        "connectivity.wifi_required": false,
+                        "connectivity.ble_required": true,
+                        "connectivity.bluetooth_classic_required": false,
+
+                        "wifi.required": false,
+
+                        "bluetooth.ble_required": true,
+                        "bluetooth.classic_required": false
+                    },
+
                     "next": "Q_BLE_APPLICATION"
                 },
 
+
                 {
                     "id": "bt_ble",
+
                     "label": "Bluetooth Classic + BLE",
+
+                    "set": {
+                        "connectivity.wifi_required": false,
+                        "connectivity.ble_required": true,
+                        "connectivity.bluetooth_classic_required": true,
+
+                        "wifi.required": false,
+
+                        "bluetooth.ble_required": true,
+                        "bluetooth.classic_required": true
+                    },
+
                     "next": "Q_BT_AUDIO"
                 },
 
+
                 {
                     "id": "wifi_only",
+
                     "label": "Wi-Fi only",
+
+                    "set": {
+                        "connectivity.wifi_required": true,
+                        "connectivity.ble_required": false,
+                        "connectivity.bluetooth_classic_required": false,
+
+                        "wifi.required": true,
+
+                        "bluetooth.ble_required": false,
+                        "bluetooth.classic_required": false
+                    },
+
                     "next": "Q_WIFI_BAND"
                 },
+
 
                 {
                     "id": "wifi_ble",
-                    "label": "Wi-Fi + BLE",
+
+                    "label": "Wi-Fi + Bluetooth LE",
+
+                    "set": {
+                        "connectivity.wifi_required": true,
+                        "connectivity.ble_required": true,
+                        "connectivity.bluetooth_classic_required": false,
+
+                        "wifi.required": true,
+
+                        "bluetooth.ble_required": true,
+                        "bluetooth.classic_required": false
+                    },
+
                     "next": "Q_WIFI_BAND"
                 },
 
+
                 {
                     "id": "wifi_bt",
+
                     "label": "Wi-Fi + Bluetooth Classic / BLE",
-                    "next": "Q_WIFI_GENERATION"
+
+                    "set": {
+                        "connectivity.wifi_required": true,
+                        "connectivity.ble_required": true,
+                        "connectivity.bluetooth_classic_required": true,
+
+                        "wifi.required": true,
+
+                        "bluetooth.ble_required": true,
+                        "bluetooth.classic_required": true
+                    },
+
+                    "next": "Q_WIFI_BAND"
                 }
             ]
         },
@@ -56,19 +125,40 @@
 
                 {
                     "id": "general_low_power",
+
                     "label": "General low-power BLE / sensing",
+
+                    "set": {
+                        "application.category": "general_low_power_ble",
+                        "preferences.low_power": true
+                    },
+
                     "next": "Q_BLE_CAN"
                 },
+
 
                 {
                     "id": "secure_automotive",
+
                     "label": "Secure automotive / access application",
+
+                    "set": {
+                        "application.category": "secure_automotive"
+                    },
+
                     "next": "Q_BLE_CAN"
                 },
 
+
                 {
                     "id": "industrial",
+
                     "label": "Industrial / automation application",
+
+                    "set": {
+                        "application.category": "industrial_ble"
+                    },
+
                     "next": "Q_BLE_CAN"
                 }
             ]
@@ -81,7 +171,23 @@
 
             "type": "yes_no",
 
-            "next": null
+            "yes": {
+
+                "set": {
+                    "interfaces.can_required": true
+                },
+
+                "next": null
+            },
+
+            "no": {
+
+                "set": {
+                    "interfaces.can_required": false
+                },
+
+                "next": null
+            }
         },
 
 
@@ -91,7 +197,23 @@
 
             "type": "yes_no",
 
-            "next": null
+            "yes": {
+
+                "set": {
+                    "bluetooth.audio_required": true
+                },
+
+                "next": null
+            },
+
+            "no": {
+
+                "set": {
+                    "bluetooth.audio_required": false
+                },
+
+                "next": null
+            }
         },
 
 
@@ -101,13 +223,83 @@
 
             "type": "yes_no",
 
-            "next": "Q_ARCHITECTURE"
+            "yes": {
+
+                "set": {
+                    "wifi.band_5ghz_required": true
+                },
+
+                "next": "Q_WIFI_GENERATION"
+            },
+
+            "no": {
+
+                "set": {
+                    "wifi.band_5ghz_required": false,
+                    "wifi.band_2_4ghz_required": true
+                },
+
+                "next": "Q_WIFI_GENERATION"
+            }
+        },
+
+
+        "Q_WIFI_GENERATION": {
+
+            "text": "Does the customer require Wi-Fi 6?",
+
+            "type": "yes_no",
+
+            "yes": {
+
+                "set": {
+                    "wifi.wifi6_required": true
+                },
+
+                "next": "Q_WIFI6_MIMO"
+            },
+
+            "no": {
+
+                "set": {
+                    "wifi.wifi6_required": false
+                },
+
+                "next": "Q_ARCHITECTURE"
+            }
+        },
+
+
+        "Q_WIFI6_MIMO": {
+
+            "text": "Is 2x2 MIMO mandatory for the application?",
+
+            "type": "yes_no",
+
+            "yes": {
+
+                "set": {
+                    "wifi.mimo_2x2_required": true,
+                    "preferences.high_performance": true
+                },
+
+                "next": "Q_ARCHITECTURE"
+            },
+
+            "no": {
+
+                "set": {
+                    "wifi.mimo_2x2_required": false
+                },
+
+                "next": "Q_ARCHITECTURE"
+            }
         },
 
 
         "Q_ARCHITECTURE": {
 
-            "text": "Should the wireless module provide embedded processing, or will a host processor control it?",
+            "text": "Which wireless architecture best fits the customer's design?",
 
             "type": "single_choice",
 
@@ -115,19 +307,42 @@
 
                 {
                     "id": "embedded",
-                    "label": "Embedded processing preferred",
+
+                    "label": "Embedded processing in the wireless module is required",
+
+                    "set": {
+                        "architecture.preference": "embedded_mcu",
+                        "embedded_features.integrated_mcu_required": true
+                    },
+
                     "next": "Q_RICH_PERIPHERALS"
                 },
 
+
                 {
                     "id": "host_based",
-                    "label": "Host-based module required",
+
+                    "label": "Host-based wireless module is preferred",
+
+                    "set": {
+                        "architecture.preference": "host_based",
+                        "embedded_features.integrated_mcu_required": false
+                    },
+
                     "next": "Q_HOST_INTERFACE"
                 },
 
+
                 {
                     "id": "unknown",
+
                     "label": "Not known yet",
+
+                    "set": {
+                        "architecture.preference": null,
+                        "embedded_features.integrated_mcu_required": false
+                    },
+
                     "next": "Q_HOST_INTERFACE"
                 }
             ]
@@ -136,65 +351,131 @@
 
         "Q_RICH_PERIPHERALS": {
 
-            "text": "Does the application need richer analog or capacitive-touch peripherals?",
+            "text": "Does the embedded application require ADC or capacitive-touch features?",
 
-            "type": "yes_no",
+            "type": "single_choice",
 
-            "next": null
+            "options": [
+
+                {
+                    "id": "none",
+
+                    "label": "No special analog / touch requirement",
+
+                    "set": {
+                        "embedded_features.adc_required": false,
+                        "embedded_features.capacitive_touch_required": false
+                    },
+
+                    "next": null
+                },
+
+
+                {
+                    "id": "adc",
+
+                    "label": "ADC required",
+
+                    "set": {
+                        "embedded_features.adc_required": true,
+                        "embedded_features.capacitive_touch_required": false
+                    },
+
+                    "next": null
+                },
+
+
+                {
+                    "id": "touch",
+
+                    "label": "Capacitive touch required",
+
+                    "set": {
+                        "embedded_features.adc_required": false,
+                        "embedded_features.capacitive_touch_required": true
+                    },
+
+                    "next": null
+                },
+
+
+                {
+                    "id": "both",
+
+                    "label": "Both ADC and capacitive touch required",
+
+                    "set": {
+                        "embedded_features.adc_required": true,
+                        "embedded_features.capacitive_touch_required": true
+                    },
+
+                    "next": null
+                }
+            ]
         },
 
 
         "Q_HOST_INTERFACE": {
 
-            "text": "Which host interface is available?",
+            "text": "Which host interfaces are available on the customer's processor?",
 
             "type": "multiple_choice",
+
+            "before_answer": {
+                "interfaces.usb_available": false,
+                "interfaces.sdio_available": false,
+                "interfaces.pcie_available": false
+            },
 
             "options": [
 
                 {
                     "id": "usb",
-                    "label": "USB"
+
+                    "label": "USB",
+
+                    "set": {
+                        "interfaces.usb_available": true
+                    }
                 },
+
 
                 {
                     "id": "sdio",
-                    "label": "SDIO"
+
+                    "label": "SDIO",
+
+                    "set": {
+                        "interfaces.sdio_available": true
+                    }
                 },
+
 
                 {
                     "id": "pcie",
-                    "label": "PCIe"
+
+                    "label": "PCIe",
+
+                    "set": {
+                        "interfaces.pcie_available": true
+                    }
                 },
+
 
                 {
                     "id": "unknown",
-                    "label": "Not known"
+
+                    "label": "Not known yet",
+
+                    "set": {
+                        "interfaces.usb_available": null,
+                        "interfaces.sdio_available": null,
+                        "interfaces.pcie_available": null
+                    }
                 }
             ],
 
             "next": null
-        },
-
-
-        "Q_WIFI_GENERATION": {
-
-            "text": "Does the customer require Wi-Fi 6 performance?",
-
-            "type": "yes_no",
-
-            "yes_next": "Q_WIFI6_MIMO",
-            "no_next": "Q_HOST_INTERFACE"
-        },
-
-
-        "Q_WIFI6_MIMO": {
-
-            "text": "Is 2x2 MIMO required?",
-
-            "type": "yes_no",
-
-            "next": "Q_HOST_INTERFACE"
         }
     }
 }
