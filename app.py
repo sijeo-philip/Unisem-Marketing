@@ -417,6 +417,44 @@ def api_system():
         result["question_tree_available"] = True
 
     return jsonify(result)
+    
+    
+@app.get("/api/question-tree")
+def api_question_tree():
+    """
+    Return a browser-friendly representation of the
+    Sales Wizard question tree.
+
+    Important:
+    This does NOT execute the recommendation engine.
+    It only exposes the questionnaire structure.
+    """
+
+    try:
+
+        raw_tree = load_json_file("question_tree.json")
+        normalized_tree = (normalize_question_tree(raw_tree))
+        return jsonify({"status": "ok", **normalized_tree})
+
+    except FileNotFoundError:
+        return jsonify(
+            {
+                "status": "error",
+                "error": (
+                    "question_tree.json "
+                    "was not found"
+                ),
+            }
+        ), 404
+
+
+    except Exception as exc:
+        return jsonify(
+            {
+                "status": "error",
+                "error": str(exc),
+            }
+        ), 500
 
 
 # ============================================================
