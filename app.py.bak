@@ -666,21 +666,45 @@ def api_wizard():
         # Replay all customer answers.
         # ----------------------------------------------------
 
-        for (answer_index, answer_value) in enumerate(answers):
+        for (
+            answer_index,
+            answer_value,
+        ) in enumerate(
+            answers
+        ):
+
             if session.is_complete():
+
                 raise ValueError(
                     "Answers were supplied after "
                     "the questionnaire had already "
                     "completed"
                 )
-            session.answer(answer_value)
+
+
+            session.answer(
+                answer_value
+            )
+
+
         # ----------------------------------------------------
         # Questionnaire complete
         # ----------------------------------------------------
 
         if session.is_complete():
-            requirement = (session.get_requirement())
-            result = (build_recommendation_result(requirement))
+
+            requirement = (
+                session.get_requirement()
+            )
+
+
+            result = (
+                build_recommendation_result(
+                    requirement
+                )
+            )
+
+
             return jsonify(
                 {
                     "status": "ok",
@@ -688,23 +712,42 @@ def api_wizard():
                 }
             )
 
+
         # ----------------------------------------------------
         # Questionnaire still active
         # ----------------------------------------------------
 
-        current_question = (session.get_current_question())
-        browser_question = (normalize_live_question(current_question,len(answers) + 1))
+        current_question = (
+            session.get_current_question()
+        )
+
+
+        browser_question = (
+            normalize_live_question(
+                current_question,
+                len(answers) + 1,
+            )
+        )
+
 
         return jsonify(
             {
                 "status": "ok",
-                "state": "question",
-                "step": len(answers) + 1,
-                "question": browser_question,
+
+                "state":
+                    "question",
+
+                "step":
+                    len(answers) + 1,
+
+                "question":
+                    browser_question,
             }
         )
 
+
     except FileNotFoundError as exc:
+
         return jsonify(
             {
                 "status": "error",
@@ -715,7 +758,14 @@ def api_wizard():
             }
         ), 500
 
-    except (QuestionTreeError, ValueError, TypeError, KeyError) as exc:
+
+    except (
+        QuestionTreeError,
+        ValueError,
+        TypeError,
+        KeyError,
+    ) as exc:
+
         return jsonify(
             {
                 "status": "error",
@@ -725,7 +775,12 @@ def api_wizard():
 
 
     except Exception as exc:
-        print("Unexpected wizard error:", repr(exc))
+
+        print(
+            "Unexpected wizard error:",
+            repr(exc),
+        )
+
         return jsonify(
             {
                 "status": "error",

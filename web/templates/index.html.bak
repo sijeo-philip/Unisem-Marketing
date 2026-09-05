@@ -203,86 +203,42 @@
             class="options-container"
         >
         </div>
-		
-		<div
-			id="questionActions"
-			class="question-actions hidden"
-		>
-		</div>
 
     </div>
 
 
     <div
-    id="wizardComplete"
-    class="wizard-complete hidden"
->
-
-    <div class="complete-icon">
-        ✓
-    </div>
-
-
-    <h3 id="completionTitle">
-        Requirement evaluation complete
-    </h3>
-
-
-    <p id="completionMessage">
-        The Unisem recommendation engine has
-        evaluated the customer requirements.
-    </p>
-
-
-    <div
-        id="answerSummary"
-        class="answer-summary"
-    >
-    </div>
-
-
-    <div
-        id="recommendationPanel"
-        class="recommendation-panel hidden"
+        id="wizardComplete"
+        class="wizard-complete hidden"
     >
 
-        <div
-            id="decisionBadge"
-            class="decision-badge"
-        >
+        <div class="complete-icon">
+            ✓
         </div>
 
-
-        <h3
-            id="recommendedModule"
-            class="recommended-module"
-        >
+        <h3>
+            Customer requirements captured
         </h3>
 
-
-        <p
-            id="recommendedModuleName"
-            class="recommended-module-name"
-        >
+        <p>
+            The questionnaire has been completed
+            successfully.
         </p>
 
-
-        <p
-            id="chooseWhen"
-            class="choose-when"
-        >
+        <p>
+            In Lesson 2C these answers will be sent
+            to the validated Unisem recommendation
+            engine.
         </p>
 
 
         <div
-            id="recommendationDetails"
-            class="recommendation-details"
+            id="answerSummary"
+            class="answer-summary"
         >
         </div>
 
     </div>
-
-</div>
 
 </section>
 
