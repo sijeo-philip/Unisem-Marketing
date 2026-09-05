@@ -1,0 +1,284 @@
+
+* {
+    box-sizing: border-box;
+}
+
+
+body {
+    margin: 0;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background: #f5f7f6;
+
+    color: #202525;
+}
+
+
+.top-header {
+    height: 76px;
+
+    background: white;
+
+    border-bottom: 1px solid #e2e7e4;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 0 48px;
+}
+
+
+.brand-name {
+    font-size: 22px;
+
+    font-weight: 700;
+
+    letter-spacing: 1.5px;
+}
+
+
+.brand-subtitle {
+    margin-top: 3px;
+
+    font-size: 12px;
+
+    color: #6b7470;
+}
+
+
+.offline-badge {
+    padding: 7px 12px;
+
+    border-radius: 20px;
+
+    background: #e7f4eb;
+
+    color: #176d37;
+
+    font-size: 12px;
+
+    font-weight: bold;
+}
+
+
+.main-container {
+    max-width: 1100px;
+
+    margin: auto;
+
+    padding: 64px 32px;
+}
+
+
+.hero {
+    max-width: 760px;
+
+    padding: 24px 0 54px;
+}
+
+
+.eyebrow {
+    margin: 0 0 14px;
+
+    color: #36764a;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    letter-spacing: 1.2px;
+}
+
+
+.hero h1 {
+    margin: 0;
+
+    font-size: 44px;
+
+    line-height: 1.12;
+
+    max-width: 700px;
+}
+
+
+.hero-text {
+    max-width: 640px;
+
+    margin-top: 22px;
+
+    color: #606a66;
+
+    font-size: 18px;
+
+    line-height: 1.6;
+}
+
+
+.primary-button {
+    margin-top: 22px;
+
+    padding: 14px 24px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #246b3c;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+
+.primary-button:hover {
+    opacity: 0.92;
+}
+
+
+.status-panel {
+    background: white;
+
+    padding: 28px;
+
+    border-radius: 12px;
+
+    border: 1px solid #e1e5e3;
+}
+
+
+.status-panel h2 {
+    margin-top: 0;
+}
+
+
+.status-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 16px;
+
+    margin-top: 24px;
+}
+
+
+.status-card {
+    background: #f8faf9;
+
+    border: 1px solid #e7ebe9;
+
+    border-radius: 8px;
+
+    padding: 18px;
+
+    min-height: 95px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: space-between;
+}
+
+
+.status-label {
+    color: #707975;
+
+    font-size: 13px;
+}
+
+
+.status-value {
+    margin-top: 14px;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    color: #246b3c;
+}
+
+
+.status-value.error {
+    color: #a22b2b;
+}
+
+
+.status-value.pending {
+    color: #777;
+}
+
+
+.lesson-message {
+    margin-top: 32px;
+
+    background: white;
+
+    border: 1px solid #e1e5e3;
+
+    border-radius: 12px;
+
+    padding: 28px;
+}
+
+
+.hidden {
+    display: none;
+}
+
+
+footer {
+    margin-top: 60px;
+
+    padding: 28px;
+
+    text-align: center;
+
+    color: #89918e;
+
+    font-size: 12px;
+}
+
+
+@media (max-width: 800px) {
+
+    .status-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .hero h1 {
+        font-size: 36px;
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .top-header {
+        padding: 0 20px;
+    }
+
+    .main-container {
+        padding: 36px 20px;
+    }
+
+    .status-grid {
+        grid-template-columns: 1fr;
+    }
+
+}

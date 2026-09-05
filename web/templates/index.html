@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Unisem Module Selector</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+
+<body>
+
+    <header class="top-header">
+
+        <div class="brand">
+            <div class="brand-name">
+                UNISEM
+            </div>
+
+            <div class="brand-subtitle">
+                Module Marketing Tools
+            </div>
+        </div>
+
+        <div class="offline-badge">
+            OFFLINE
+        </div>
+
+    </header>
+
+
+    <main class="main-container">
+
+        <section class="hero">
+
+            <p class="eyebrow">
+                SALES & MARKETING ASSISTANT
+            </p>
+
+            <h1>
+                Find the right Unisem wireless module
+            </h1>
+
+            <p class="hero-text">
+                Answer a few customer requirement questions
+                and the tool will guide you toward the most
+                suitable Unisem module.
+            </p>
+
+            <button
+                id="startWizardButton"
+                class="primary-button"
+                type="button"
+            >
+                Start Sales Wizard
+            </button>
+
+        </section>
+
+
+        <section class="status-panel">
+
+            <h2>
+                Application Status
+            </h2>
+
+
+            <div class="status-grid">
+
+                <div class="status-card">
+
+                    <span class="status-label">
+                        Application
+                    </span>
+
+                    <span
+                        id="backendStatus"
+                        class="status-value pending"
+                    >
+                        Checking...
+                    </span>
+
+                </div>
+
+
+                <div class="status-card">
+
+                    <span class="status-label">
+                        Module Portfolio
+                    </span>
+
+                    <span
+                        id="moduleStatus"
+                        class="status-value pending"
+                    >
+                        Checking...
+                    </span>
+
+                </div>
+
+
+                <div class="status-card">
+
+                    <span class="status-label">
+                        Sales Question Tree
+                    </span>
+
+                    <span
+                        id="questionTreeStatus"
+                        class="status-value pending"
+                    >
+                        Checking...
+                    </span>
+
+                </div>
+
+
+                <div class="status-card">
+
+                    <span class="status-label">
+                        Operating Mode
+                    </span>
+
+                    <span
+                        id="offlineStatus"
+                        class="status-value"
+                    >
+                        Local / Offline
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section
+            id="lessonMessage"
+            class="lesson-message hidden"
+        >
+
+            <h2>
+                Sales Wizard
+            </h2>
+
+            <p>
+                Browser interface successfully initialized.
+            </p>
+
+            <p>
+                The dynamic questionnaire will be connected
+                in Lesson 2B.
+            </p>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+
+        Unisem Module Marketing Tools
+
+    </footer>
+
+
+    <script
+        src="{{ url_for('static', filename='js/app.js') }}"
+    ></script>
+
+</body>
+
+</html>
