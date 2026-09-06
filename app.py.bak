@@ -553,7 +553,9 @@ def build_sales_view(decision, recommendation, top_candidate, ranked_results, mo
         "alternatives": alternatives,
     }    
     
-def build_recommendation_result(requirement):
+def build_recommendation_result(
+    requirement,
+):
     """
     Evaluate the completed customer requirement against
     the Unisem module portfolio.
@@ -561,42 +563,139 @@ def build_recommendation_result(requirement):
     Lesson 2D additionally creates a salesperson-friendly
     presentation model without changing selection logic.
     """
-    module_data = load_json_file("modules.json")
-    modules = extract_modules(module_data)
+
+    module_data = load_json_file(
+        "modules.json"
+    )
+
+
+    modules = extract_modules(
+        module_data
+    )
+
+
     # --------------------------------------------------------
     # Lesson 1 selection engine
     # --------------------------------------------------------
-    results = evaluate_portfolio(requirement, modules)
-    requirement_summary = (summarize_requirement(requirement))
-    top_candidate = (results[0] if results else None)
+
+    results = evaluate_portfolio(
+        requirement,
+        modules,
+    )
+
+
+    requirement_summary = (
+        summarize_requirement(
+            requirement
+        )
+    )
+
+
+    top_candidate = (
+        results[0]
+        if results
+        else None
+    )
+
+
     recommendation = None
+
+
     # --------------------------------------------------------
     # Preserve Lesson 2C decision rules
     # --------------------------------------------------------
+
     if top_candidate is None:
-        decision = ("no_suitable_module")
-    elif (top_candidate.get("status") == "COMPATIBLE"):
-        decision = ("recommended")
-        recommendation = (top_candidate)
-    elif (top_candidate.get("status") == "NEEDS_CLARIFICATION"):
-        decision = ("clarification_required")
+
+        decision = (
+            "no_suitable_module"
+        )
+
+
+    elif (
+        top_candidate.get(
+            "status"
+        )
+        == "COMPATIBLE"
+    ):
+
+        decision = (
+            "recommended"
+        )
+
+
+        recommendation = (
+            top_candidate
+        )
+
+
+    elif (
+        top_candidate.get(
+            "status"
+        )
+        == "NEEDS_CLARIFICATION"
+    ):
+
+        decision = (
+            "clarification_required"
+        )
+
+
     else:
-        decision = ("no_suitable_module")
+
+        decision = (
+            "no_suitable_module"
+        )
+
 
     # --------------------------------------------------------
     # Lesson 2D presentation adapter
     # --------------------------------------------------------
-    sales_view = (build_sales_view(decision= decision,recommendation=recommendation,top_candidate=top_candidate,
-            ranked_results=results, modules=modules))
+
+    sales_view = (
+        build_sales_view(
+            decision=
+                decision,
+
+            recommendation=
+                recommendation,
+
+            top_candidate=
+                top_candidate,
+
+            ranked_results=
+                results,
+
+            modules=
+                modules,
+        )
+    )
+
+
     return {
-        "state": "complete",
-        "decision": decision,
-        "requirement": requirement,
-        "requirement_summary": requirement_summary,
-        "recommendation": recommendation,
-        "top_candidate": top_candidate,
-        "ranked_results": results,
-        "sales_view": sales_view,
+        "state":
+            "complete",
+
+        "decision":
+            decision,
+
+        "requirement":
+            requirement,
+
+        "requirement_summary":
+            requirement_summary,
+
+        "recommendation":
+            recommendation,
+
+        "top_candidate":
+            top_candidate,
+
+        "ranked_results":
+            results,
+
+        "sales_view":
+            sales_view,
     }
 # ============================================================
 # Question-tree normalization

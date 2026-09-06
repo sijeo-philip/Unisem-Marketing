@@ -713,3 +713,291 @@ footer {
 
     line-height: 1.4;
 }
+
+/* =========================================================
+   LESSON 2D - SALES RECOMMENDATION EXPERIENCE
+   ========================================================= */
+
+
+.result-top-row {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    margin-bottom: 16px;
+}
+
+
+.result-eyebrow {
+    margin: 0 0 10px;
+
+    color: #727c77;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+
+.module-description {
+    max-width: 650px;
+
+    margin-top: 14px;
+
+    color: #5f6965;
+
+    line-height: 1.6;
+}
+
+
+.result-headline {
+    margin-top: 30px;
+
+    margin-bottom: 8px;
+
+    font-size: 20px;
+}
+
+
+.result-summary {
+    max-width: 680px;
+
+    margin-top: 0;
+
+    color: #606b66;
+
+    line-height: 1.6;
+}
+
+
+.capability-chips {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 9px;
+
+    margin-top: 22px;
+}
+
+
+.capability-chip {
+    display: inline-block;
+
+    padding: 8px 12px;
+
+    border: 1px solid #d8e2dc;
+
+    border-radius: 20px;
+
+    background: #f2f7f4;
+
+    color: #345342;
+
+    font-size: 12px;
+
+    font-weight: bold;
+}
+
+
+.result-section {
+    margin-top: 30px;
+
+    padding-top: 24px;
+
+    border-top: 1px solid #e3e8e5;
+}
+
+
+.result-section h4 {
+    margin: 0 0 13px;
+
+    color: #303a35;
+
+    font-size: 14px;
+
+    letter-spacing: 0.4px;
+
+    text-transform: uppercase;
+}
+
+
+.result-section p {
+    color: #59645f;
+
+    line-height: 1.6;
+}
+
+
+.result-list {
+    margin: 0;
+
+    padding-left: 23px;
+}
+
+
+.result-list li {
+    margin-bottom: 10px;
+
+    color: #4f5a55;
+
+    line-height: 1.5;
+}
+
+
+.positive-list li::marker {
+    color: #267441;
+}
+
+
+.attention-section {
+    padding: 20px;
+
+    border: 1px solid #efdca9;
+
+    border-radius: 9px;
+
+    background: #fffaf0;
+}
+
+
+.attention-section h4 {
+    color: #71550c;
+}
+
+
+.conflict-section {
+    padding: 20px;
+
+    border: 1px solid #efcaca;
+
+    border-radius: 9px;
+
+    background: #fff6f6;
+}
+
+
+.conflict-section h4 {
+    color: #8a3030;
+}
+
+
+.next-action-card {
+    margin-top: 30px;
+
+    padding: 22px;
+
+    border-left: 4px solid #246b3c;
+
+    border-radius: 7px;
+
+    background: #f2f7f4;
+}
+
+
+.next-action-label {
+    color: #246b3c;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    letter-spacing: 0.7px;
+
+    text-transform: uppercase;
+}
+
+
+.next-action-card p {
+    margin-bottom: 0;
+
+    color: #39453f;
+
+    line-height: 1.55;
+}
+
+
+.alternatives-container {
+    display: grid;
+
+    gap: 12px;
+}
+
+
+.alternative-card {
+    padding: 16px 18px;
+
+    border: 1px solid #dfe5e2;
+
+    border-radius: 8px;
+
+    background: white;
+}
+
+
+.alternative-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    align-items: center;
+}
+
+
+.alternative-module {
+    font-size: 16px;
+
+    font-weight: bold;
+}
+
+
+.alternative-status {
+    color: #6d7672;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+}
+
+
+.alternative-name {
+    margin-top: 5px;
+
+    color: #68726d;
+
+    font-size: 13px;
+}
+
+
+.alternative-choose-when {
+    margin: 10px 0 0;
+
+    color: #59645f;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+@media (max-width: 600px) {
+
+    .alternative-header {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 6px;
+    }
+
+}

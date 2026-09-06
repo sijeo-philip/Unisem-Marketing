@@ -1,25 +1,13 @@
 "use strict";
 
 
-/*
-============================================================
-LESSON 2B
-Dynamic Sales Wizard
-============================================================
-*/
-
-
 const wizardState = {
 
-    tree: null,
+    engineAnswers: [],
 
-    questionsById: new Map(),
+    displayAnswers: [],
 
-    questionOrder: [],
-
-    currentQuestionId: null,
-
-    answers: []
+    currentQuestion: null
 };
 
 
@@ -29,11 +17,9 @@ document.addEventListener(
 );
 
 
-/*
-============================================================
-APPLICATION STARTUP
-============================================================
-*/
+/* ========================================================
+   APPLICATION STARTUP
+   ======================================================== */
 
 async function initializeApplication() {
 
@@ -43,11 +29,9 @@ async function initializeApplication() {
 }
 
 
-/*
-============================================================
-BACKEND HEALTH CHECK
-============================================================
-*/
+/* ========================================================
+   HEALTH CHECK
+   ======================================================== */
 
 async function checkBackend() {
 
@@ -76,10 +60,8 @@ async function checkBackend() {
 
 
         if (!response.ok) {
-
             throw new Error(
-                "Backend returned HTTP " +
-                response.status
+                "Health API failed"
             );
         }
 
@@ -140,7 +122,6 @@ async function checkBackend() {
     catch (error) {
 
         console.error(
-            "Application initialization failed:",
             error
         );
 
@@ -164,12 +145,6 @@ async function checkBackend() {
     }
 }
 
-
-/*
-============================================================
-STATUS HELPERS
-============================================================
-*/
 
 function setSuccess(
     element,
@@ -204,235 +179,46 @@ function setError(
 }
 
 
-/*
-============================================================
-BUTTON CONFIGURATION
-============================================================
-*/
+/* ========================================================
+   START BUTTON
+   ======================================================== */
 
 function configureButtons() {
 
-    const button =
-        document.getElementById(
+    document
+        .getElementById(
             "startWizardButton"
+        )
+        .addEventListener(
+            "click",
+            startWizard
         );
-
-
-    button.addEventListener(
-        "click",
-        startWizard
-    );
 }
 
 
-/*
-============================================================
-LOAD QUESTION TREE
-============================================================
-*/
-
 async function startWizard() {
 
-    const button =
-        document.getElementById(
-            "startWizardButton"
-        );
+    wizardState.engineAnswers =
+        [];
 
+    wizardState.displayAnswers =
+        [];
 
-    const wizardPanel =
-        document.getElementById(
-            "wizardPanel"
-        );
+    wizardState.currentQuestion =
+        null;
 
 
     hideWizardError();
 
 
-    button.disabled = true;
-
-    button.textContent =
-        "Loading Sales Wizard...";
-
-
-    try {
-
-        const response =
-            await fetch(
-                "/api/question-tree"
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                data.error ||
-                (
-                    "Unable to load question tree. " +
-                    "HTTP " +
-                    response.status
-                )
-            );
-        }
-
-
-        if (data.status !== "ok") {
-
-            throw new Error(
-                data.error ||
-                "Question tree returned an error"
-            );
-        }
-
-
-        initializeWizardState(
-            data
-        );
-
-
-        wizardPanel.classList.remove(
-            "hidden"
-        );
-
-
-        renderQuestion(
-            wizardState.currentQuestionId
-        );
-
-
-        wizardPanel.scrollIntoView(
-            {
-                behavior: "smooth",
-                block: "start"
-            }
-        );
-
-
-        button.textContent =
-            "Sales Wizard Running";
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Unable to start Sales Wizard:",
-            error
-        );
-
-
-        wizardPanel.classList.remove(
-            "hidden"
-        );
-
-
-        showWizardError(
-            error.message
-        );
-
-
-        button.disabled = false;
-
-        button.textContent =
-            "Start Sales Wizard";
-    }
-}
-
-
-/*
-============================================================
-INITIALIZE WIZARD STATE
-============================================================
-*/
-
-function initializeWizardState(
-    tree
-) {
-
-    if (!Array.isArray(
-        tree.questions
-    )) {
-
-        throw new Error(
-            "Question API did not return a question list"
-        );
-    }
-
-
-    if (
-        tree.questions.length === 0
-    ) {
-
-        throw new Error(
-            "Question tree contains no questions"
-        );
-    }
-
-
-    wizardState.tree =
-        tree;
-
-
-    wizardState.questionsById =
-        new Map();
-
-
-    wizardState.questionOrder =
-        [];
-
-
-    wizardState.answers =
-        [];
-
-
-    for (
-        const question
-        of tree.questions
-    ) {
-
-        const id =
-            String(
-                question.id
-            );
-
-
-        wizardState.questionsById.set(
-            id,
-            question
-        );
-
-
-        wizardState.questionOrder.push(
-            id
-        );
-    }
-
-
-    const startId =
-        String(
-            tree.start_question_id
-        );
-
-
-    if (
-        !wizardState.questionsById.has(
-            startId
+    document
+        .getElementById(
+            "wizardComplete"
         )
-    ) {
-
-        throw new Error(
-            "Start question '" +
-            startId +
-            "' does not exist"
+        .classList
+        .add(
+            "hidden"
         );
-    }
-
-
-    wizardState.currentQuestionId =
-        startId;
 
 
     document
@@ -447,97 +233,315 @@ function initializeWizardState(
 
     document
         .getElementById(
-            "wizardComplete"
+            "wizardPanel"
         )
         .classList
-        .add(
+        .remove(
             "hidden"
+        );
+
+
+    await requestWizardState();
+
+
+    document
+        .getElementById(
+            "wizardPanel"
+        )
+        .scrollIntoView(
+            {
+                behavior: "smooth"
+            }
         );
 }
 
 
-/*
-============================================================
-RENDER QUESTION
-============================================================
-*/
+/* ========================================================
+   COMMUNICATE WITH QUESTIONSESSION
+   ======================================================== */
 
-function renderQuestion(
-    questionId
-) {
+async function requestWizardState() {
 
-    const question =
-        wizardState.questionsById.get(
-            String(
-                questionId
-            )
+    hideWizardError();
+
+
+    document.getElementById(
+        "progressText"
+    ).textContent =
+        "Evaluating...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/wizard",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(
+                            {
+                                answers:
+                                    wizardState
+                                        .engineAnswers
+                            }
+                        )
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                (
+                    "Wizard API returned HTTP " +
+                    response.status
+                )
+            );
+        }
+
+
+        if (data.status !== "ok") {
+
+            throw new Error(
+                data.error ||
+                "Recommendation engine error"
+            );
+        }
+
+
+        if (
+            data.state ===
+            "question"
+        ) {
+
+            renderQuestion(
+                data.question,
+                data.step
+            );
+
+            return;
+        }
+
+
+        if (
+            data.state ===
+            "complete"
+        ) {
+
+            completeWizard(
+                data
+            );
+
+            return;
+        }
+
+
+        throw new Error(
+            "Unknown wizard state"
         );
 
-
-    if (!question) {
-
-        completeWizard();
-
-        return;
     }
 
+    catch (error) {
 
-    wizardState.currentQuestionId =
-        String(
-            questionId
+        console.error(
+            "Wizard error:",
+            error
         );
 
 
-    const questionIdElement =
+        showWizardError(
+            error.message
+        );
+    }
+}
+
+
+/* ========================================================
+   QUESTION RENDERING
+   ======================================================== */
+
+function renderQuestion(
+    question,
+    step
+) {
+
+    wizardState.currentQuestion =
+        question;
+
+
+    const questionArea =
         document.getElementById(
-            "questionId"
+            "questionArea"
         );
 
 
-    const questionTextElement =
-        document.getElementById(
-            "questionText"
-        );
+    questionArea.classList.remove(
+        "hidden"
+    );
 
 
-    const optionsContainer =
+    document.getElementById(
+        "questionId"
+    ).textContent =
+        "Requirement Question";
+
+
+    document.getElementById(
+        "questionText"
+    ).textContent =
+        question.text;
+
+
+    document.getElementById(
+        "progressText"
+    ).textContent =
+        "Question " + step;
+
+
+    const container =
         document.getElementById(
             "optionsContainer"
         );
 
 
-    questionIdElement.textContent =
-        "Requirement Question";
+    const actions =
+        document.getElementById(
+            "questionActions"
+        );
 
 
-    questionTextElement.textContent =
-        question.text;
+    container.replaceChildren();
 
+    actions.replaceChildren();
 
-    optionsContainer.replaceChildren();
-
-
-    updateProgress(
-        question.id
+    actions.classList.add(
+        "hidden"
     );
 
 
     if (
-        !Array.isArray(
-            question.options
+        isMultipleChoice(
+            question
         )
-        ||
-        question.options.length === 0
     ) {
 
-        showWizardError(
-            "Question '" +
-            question.id +
-            "' has no selectable options."
+        renderMultipleChoice(
+            question,
+            container,
+            actions
         );
 
-        return;
+    } else {
+
+        renderSingleChoice(
+            question,
+            container
+        );
     }
+}
+
+
+function isMultipleChoice(
+    question
+) {
+
+    const type =
+        String(
+            question.type || ""
+        )
+        .toLowerCase()
+        .replaceAll(
+            "-",
+            "_"
+        );
+
+
+    return (
+        type.includes(
+            "multiple"
+        )
+        ||
+        type.includes(
+            "multi_select"
+        )
+    );
+}
+
+
+/* ========================================================
+   SINGLE CHOICE
+   ======================================================== */
+
+function renderSingleChoice(
+    question,
+    container
+) {
+
+    for (
+        const option
+        of question.options
+    ) {
+
+        const button =
+            document.createElement(
+                "button"
+            );
+
+
+        button.type =
+            "button";
+
+        button.className =
+            "option-button";
+
+        button.textContent =
+            option.label;
+
+
+        button.addEventListener(
+            "click",
+            async function () {
+
+                await submitAnswer(
+                    option.value,
+                    option.label
+                );
+            }
+        );
+
+
+        container.appendChild(
+            button
+        );
+    }
+}
+
+
+/* ========================================================
+   MULTIPLE CHOICE
+   ======================================================== */
+
+function renderMultipleChoice(
+    question,
+    container,
+    actions
+) {
+
+    const selected =
+        new Map();
 
 
     for (
@@ -554,10 +558,8 @@ function renderQuestion(
         button.type =
             "button";
 
-
         button.className =
             "option-button";
-
 
         button.textContent =
             option.label;
@@ -567,199 +569,247 @@ function renderQuestion(
             "click",
             function () {
 
-                selectOption(
-                    question,
-                    option
-                );
+                const key =
+                    String(
+                        option.value
+                    );
+
+
+                const isUnknown =
+                    key
+                    .toLowerCase()
+                    === "unknown";
+
+
+                if (isUnknown) {
+
+                    selected.clear();
+
+
+                    for (
+                        const child
+                        of container.children
+                    ) {
+
+                        child.classList.remove(
+                            "selected"
+                        );
+                    }
+                }
+
+
+                if (
+                    !isUnknown
+                    &&
+                    selected.has(
+                        "unknown"
+                    )
+                ) {
+
+                    selected.delete(
+                        "unknown"
+                    );
+
+
+                    for (
+                        const child
+                        of container.children
+                    ) {
+
+                        if (
+                            child.dataset.value
+                            === "unknown"
+                        ) {
+
+                            child.classList.remove(
+                                "selected"
+                            );
+                        }
+                    }
+                }
+
+
+                if (
+                    selected.has(
+                        key
+                    )
+                ) {
+
+                    selected.delete(
+                        key
+                    );
+
+                    button.classList.remove(
+                        "selected"
+                    );
+
+                } else {
+
+                    selected.set(
+                        key,
+                        option
+                    );
+
+                    button.classList.add(
+                        "selected"
+                    );
+                }
+
+
+                continueButton.disabled =
+                    selected.size === 0;
             }
         );
 
 
-        optionsContainer.appendChild(
+        button.dataset.value =
+            String(
+                option.value
+            );
+
+
+        container.appendChild(
             button
         );
     }
-}
 
 
-/*
-============================================================
-SELECT ANSWER
-============================================================
-*/
+    const continueButton =
+        document.createElement(
+            "button"
+        );
 
-function selectOption(
-    question,
-    option
-) {
 
-    wizardState.answers.push(
-        {
-            question_id:
-                question.id,
+    continueButton.type =
+        "button";
 
-            question:
-                question.text,
+    continueButton.className =
+        "continue-button";
 
-            value:
-                option.value,
+    continueButton.textContent =
+        "Continue";
 
-            label:
-                option.label
+    continueButton.disabled =
+        true;
+
+
+    continueButton.addEventListener(
+        "click",
+        async function () {
+
+            const options =
+                Array.from(
+                    selected.values()
+                );
+
+
+            const values =
+                options.map(
+                    option =>
+                        option.value
+                );
+
+
+            const labels =
+                options.map(
+                    option =>
+                        option.label
+                );
+
+
+            await submitAnswer(
+                values,
+                labels.join(", ")
+            );
         }
     );
 
 
-    const nextQuestionId =
-        option.next_question_id;
+    actions.appendChild(
+        continueButton
+    );
 
 
-    /*
-    --------------------------------------------------------
-    No next question = questionnaire finished.
-    --------------------------------------------------------
-    */
-
-    if (
-        nextQuestionId === null
-        ||
-        nextQuestionId === undefined
-        ||
-        nextQuestionId === ""
-    ) {
-
-        completeWizard();
-
-        return;
-    }
-
-
-    /*
-    --------------------------------------------------------
-    A next value may represent a terminal node such as:
-
-        END
-        COMPLETE
-        RESULT
-        recommendation
-
-    If it does not correspond to another question, Lesson 2B
-    treats it as questionnaire completion.
-
-    Lesson 2C will let the Python decision engine own this
-    behavior.
-    --------------------------------------------------------
-    */
-
-    if (
-        !wizardState.questionsById.has(
-            String(
-                nextQuestionId
-            )
-        )
-    ) {
-
-        completeWizard();
-
-        return;
-    }
-
-
-    renderQuestion(
-        String(
-            nextQuestionId
-        )
+    actions.classList.remove(
+        "hidden"
     );
 }
 
 
-/*
-============================================================
-PROGRESS INDICATOR
-============================================================
-*/
+/* ========================================================
+   SUBMIT ANSWER
+   ======================================================== */
 
-function updateProgress(
-    questionId
+async function submitAnswer(
+    engineValue,
+    displayLabel
 ) {
 
-    const position =
-        wizardState
-            .questionOrder
-            .indexOf(
-                String(
-                    questionId
-                )
-            );
+    const question =
+        wizardState.currentQuestion;
 
 
-    const progressElement =
-        document.getElementById(
-            "progressText"
-        );
+    wizardState.engineAnswers.push(
+        engineValue
+    );
 
 
-    if (position >= 0) {
+    wizardState.displayAnswers.push(
+        {
+            question:
+                question.text,
 
-        progressElement.textContent =
-            "Question " +
-            (position + 1) +
-            " of " +
-            wizardState.questionOrder.length;
+            label:
+                displayLabel
+        }
+    );
 
-    } else {
 
-        progressElement.textContent =
-            "Sales Wizard";
-    }
+    await requestWizardState();
 }
 
 
-/*
-============================================================
-QUESTIONNAIRE COMPLETE
-============================================================
-*/
+/* ========================================================
+   COMPLETION
+   ======================================================== */
 
-function completeWizard() {
+function completeWizard(
+    data
+) {
 
-    const questionArea =
-        document.getElementById(
+    document
+        .getElementById(
             "questionArea"
+        )
+        .classList
+        .add(
+            "hidden"
         );
 
 
-    const completeArea =
-        document.getElementById(
+    document
+        .getElementById(
             "wizardComplete"
+        )
+        .classList
+        .remove(
+            "hidden"
         );
-
-
-    questionArea.classList.add(
-        "hidden"
-    );
-
-
-    completeArea.classList.remove(
-        "hidden"
-    );
 
 
     document.getElementById(
         "progressText"
     ).textContent =
-        "Requirements captured";
+        "Evaluation complete";
 
 
     renderAnswerSummary();
+
+    renderRecommendation(
+        data
+    );
 }
 
-
-/*
-============================================================
-ANSWER SUMMARY
-============================================================
-*/
 
 function renderAnswerSummary() {
 
@@ -774,7 +824,7 @@ function renderAnswerSummary() {
 
     for (
         const answer
-        of wizardState.answers
+        of wizardState.displayAnswers
     ) {
 
         const row =
@@ -796,7 +846,6 @@ function renderAnswerSummary() {
         question.className =
             "answer-question";
 
-
         question.textContent =
             answer.question;
 
@@ -810,17 +859,12 @@ function renderAnswerSummary() {
         value.className =
             "answer-value";
 
-
         value.textContent =
             answer.label;
 
 
-        row.appendChild(
-            question
-        );
-
-
-        row.appendChild(
+        row.append(
+            question,
             value
         );
 
@@ -832,11 +876,246 @@ function renderAnswerSummary() {
 }
 
 
-/*
-============================================================
-ERROR HANDLING
-============================================================
-*/
+/* ========================================================
+   RECOMMENDATION DISPLAY
+   ======================================================== */
+
+function renderRecommendation(
+    data
+) {
+
+    const panel =
+        document.getElementById(
+            "recommendationPanel"
+        );
+
+
+    panel.classList.remove(
+        "hidden"
+    );
+
+
+    const badge =
+        document.getElementById(
+            "decisionBadge"
+        );
+
+
+    const moduleElement =
+        document.getElementById(
+            "recommendedModule"
+        );
+
+
+    const nameElement =
+        document.getElementById(
+            "recommendedModuleName"
+        );
+
+
+    const chooseWhenElement =
+        document.getElementById(
+            "chooseWhen"
+        );
+
+
+    const details =
+        document.getElementById(
+            "recommendationDetails"
+        );
+
+
+    details.replaceChildren();
+
+
+    const candidate =
+        data.recommendation
+        ||
+        data.top_candidate;
+
+
+    badge.className =
+        "decision-badge";
+
+
+    if (
+        data.decision ===
+        "recommended"
+    ) {
+
+        badge.textContent =
+            "Compatible";
+
+        badge.classList.add(
+            "compatible"
+        );
+
+
+    } else if (
+        data.decision ===
+        "clarification_required"
+    ) {
+
+        badge.textContent =
+            "Needs Clarification";
+
+        badge.classList.add(
+            "clarification"
+        );
+
+
+    } else {
+
+        badge.textContent =
+            "No Suitable Module";
+
+        badge.classList.add(
+            "not-suitable"
+        );
+    }
+
+
+    if (!candidate) {
+
+        moduleElement.textContent =
+            "No module available";
+
+        nameElement.textContent =
+            "";
+
+        chooseWhenElement.textContent =
+            "";
+
+        return;
+    }
+
+
+    moduleElement.textContent =
+        candidate.module_id
+        || "Candidate Module";
+
+
+    nameElement.textContent =
+        candidate.module_name
+        || "";
+
+
+    chooseWhenElement.textContent =
+        candidate.choose_when
+        || "";
+
+
+    addDetailSection(
+        details,
+        "Clarifications",
+        candidate.clarifications
+    );
+
+
+    addDetailSection(
+        details,
+        "Requirements satisfied",
+        candidate.passed_requirements
+    );
+
+
+    addDetailSection(
+        details,
+        "Conflicts",
+        candidate.hard_failures
+    );
+
+
+    addDetailSection(
+        details,
+        "Preference notes",
+        candidate.preference_notes
+    );
+}
+
+
+function addDetailSection(
+    parent,
+    title,
+    items
+) {
+
+    if (
+        !Array.isArray(
+            items
+        )
+        ||
+        items.length === 0
+    ) {
+
+        return;
+    }
+
+
+    const section =
+        document.createElement(
+            "div"
+        );
+
+
+    section.className =
+        "detail-section";
+
+
+    const heading =
+        document.createElement(
+            "h4"
+        );
+
+
+    heading.textContent =
+        title;
+
+
+    const list =
+        document.createElement(
+            "ul"
+        );
+
+
+    for (
+        const item
+        of items
+    ) {
+
+        const listItem =
+            document.createElement(
+                "li"
+            );
+
+
+        listItem.textContent =
+            String(
+                item
+            );
+
+
+        list.appendChild(
+            listItem
+        );
+    }
+
+
+    section.append(
+        heading,
+        list
+    );
+
+
+    parent.appendChild(
+        section
+    );
+}
+
+
+/* ========================================================
+   ERRORS
+   ======================================================== */
 
 function showWizardError(
     message
@@ -855,6 +1134,12 @@ function showWizardError(
     element.classList.remove(
         "hidden"
     );
+
+
+    document.getElementById(
+        "progressText"
+    ).textContent =
+        "Engine error";
 }
 
 

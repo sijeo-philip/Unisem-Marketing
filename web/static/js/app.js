@@ -879,10 +879,29 @@ function renderAnswerSummary() {
 /* ========================================================
    RECOMMENDATION DISPLAY
    ======================================================== */
+/* ========================================================
+   LESSON 2D
+   SALES RECOMMENDATION PRESENTATION
+   ======================================================== */
 
 function renderRecommendation(
     data
 ) {
+
+    const view =
+        data.sales_view;
+
+
+    if (!view) {
+
+        showWizardError(
+            "Recommendation presentation data "
+            + "was not returned by the server."
+        );
+
+        return;
+    }
+
 
     const panel =
         document.getElementById(
@@ -895,13 +914,132 @@ function renderRecommendation(
     );
 
 
+    renderOutcome(
+        view.outcome
+    );
+
+
+    renderModule(
+        view.module
+    );
+
+
+    renderTextListSection(
+        "whySection",
+        "whyList",
+        view.why_this_module
+    );
+
+
+    renderTextListSection(
+        "clarificationSection",
+        "clarificationList",
+        view.clarifications
+    );
+
+
+    renderTextListSection(
+        "conflictSection",
+        "conflictList",
+        view.conflicts
+    );
+
+
+    renderTextListSection(
+        "preferenceSection",
+        "preferenceList",
+        view.preference_notes
+    );
+
+
+    document.getElementById(
+        "nextAction"
+    ).textContent =
+        view.next_action || "";
+
+
+    renderAlternatives(
+        view.alternatives
+    );
+}
+
+
+/* ========================================================
+   OUTCOME
+   ======================================================== */
+
+function renderOutcome(
+    outcome
+) {
+
     const badge =
         document.getElementById(
             "decisionBadge"
         );
 
 
-    const moduleElement =
+    badge.className =
+        "decision-badge";
+
+
+    badge.textContent =
+        outcome.label || "";
+
+
+    if (
+        outcome.code ===
+        "recommended"
+    ) {
+
+        badge.classList.add(
+            "compatible"
+        );
+
+    } else if (
+        outcome.code ===
+        "clarification_required"
+    ) {
+
+        badge.classList.add(
+            "clarification"
+        );
+
+    } else {
+
+        badge.classList.add(
+            "not-suitable"
+        );
+    }
+
+
+    document.getElementById(
+        "resultHeadline"
+    ).textContent =
+        outcome.headline || "";
+
+
+    document.getElementById(
+        "resultSummary"
+    ).textContent =
+        outcome.summary || "";
+}
+
+
+/* ========================================================
+   MODULE INFORMATION
+   ======================================================== */
+
+function renderModule(
+    module
+) {
+
+    const roleElement =
+        document.getElementById(
+            "moduleRole"
+        );
+
+
+    const idElement =
         document.getElementById(
             "recommendedModule"
         );
@@ -913,132 +1051,170 @@ function renderRecommendation(
         );
 
 
-    const chooseWhenElement =
+    const descriptionElement =
+        document.getElementById(
+            "moduleDescription"
+        );
+
+
+    const chips =
+        document.getElementById(
+            "capabilityChips"
+        );
+
+
+    const chooseSection =
+        document.getElementById(
+            "chooseWhenSection"
+        );
+
+
+    const chooseText =
         document.getElementById(
             "chooseWhen"
         );
 
 
-    const details =
-        document.getElementById(
-            "recommendationDetails"
-        );
+    chips.replaceChildren();
 
 
-    details.replaceChildren();
+    if (!module) {
 
+        roleElement.textContent =
+            "Portfolio Evaluation";
 
-    const candidate =
-        data.recommendation
-        ||
-        data.top_candidate;
-
-
-    badge.className =
-        "decision-badge";
-
-
-    if (
-        data.decision ===
-        "recommended"
-    ) {
-
-        badge.textContent =
-            "Compatible";
-
-        badge.classList.add(
-            "compatible"
-        );
-
-
-    } else if (
-        data.decision ===
-        "clarification_required"
-    ) {
-
-        badge.textContent =
-            "Needs Clarification";
-
-        badge.classList.add(
-            "clarification"
-        );
-
-
-    } else {
-
-        badge.textContent =
-            "No Suitable Module";
-
-        badge.classList.add(
-            "not-suitable"
-        );
-    }
-
-
-    if (!candidate) {
-
-        moduleElement.textContent =
-            "No module available";
+        idElement.textContent =
+            "No module identified";
 
         nameElement.textContent =
             "";
 
-        chooseWhenElement.textContent =
+        descriptionElement.textContent =
             "";
+
+        descriptionElement.classList.add(
+            "hidden"
+        );
+
+        chooseSection.classList.add(
+            "hidden"
+        );
 
         return;
     }
 
 
-    moduleElement.textContent =
-        candidate.module_id
-        || "Candidate Module";
+    roleElement.textContent =
+        module.role || "";
+
+
+    idElement.textContent =
+        module.module_id || "";
 
 
     nameElement.textContent =
-        candidate.module_name
-        || "";
+        module.module_name || "";
 
 
-    chooseWhenElement.textContent =
-        candidate.choose_when
-        || "";
+    if (module.description) {
+
+        descriptionElement.textContent =
+            module.description;
+
+        descriptionElement.classList.remove(
+            "hidden"
+        );
+
+    } else {
+
+        descriptionElement.textContent =
+            "";
+
+        descriptionElement.classList.add(
+            "hidden"
+        );
+    }
 
 
-    addDetailSection(
-        details,
-        "Clarifications",
-        candidate.clarifications
-    );
+    if (
+        Array.isArray(
+            module.capabilities
+        )
+    ) {
+
+        for (
+            const capability
+            of module.capabilities
+        ) {
+
+            const chip =
+                document.createElement(
+                    "span"
+                );
 
 
-    addDetailSection(
-        details,
-        "Requirements satisfied",
-        candidate.passed_requirements
-    );
+            chip.className =
+                "capability-chip";
 
 
-    addDetailSection(
-        details,
-        "Conflicts",
-        candidate.hard_failures
-    );
+            chip.textContent =
+                capability;
 
 
-    addDetailSection(
-        details,
-        "Preference notes",
-        candidate.preference_notes
-    );
+            chips.appendChild(
+                chip
+            );
+        }
+    }
+
+
+    if (module.choose_when) {
+
+        chooseText.textContent =
+            module.choose_when;
+
+
+        chooseSection.classList.remove(
+            "hidden"
+        );
+
+    } else {
+
+        chooseText.textContent =
+            "";
+
+
+        chooseSection.classList.add(
+            "hidden"
+        );
+    }
 }
 
 
-function addDetailSection(
-    parent,
-    title,
+/* ========================================================
+   TEXT LIST SECTIONS
+   ======================================================== */
+
+function renderTextListSection(
+    sectionId,
+    listId,
     items
 ) {
+
+    const section =
+        document.getElementById(
+            sectionId
+        );
+
+
+    const list =
+        document.getElementById(
+            listId
+        );
+
+
+    list.replaceChildren();
+
 
     if (
         !Array.isArray(
@@ -1048,34 +1224,12 @@ function addDetailSection(
         items.length === 0
     ) {
 
+        section.classList.add(
+            "hidden"
+        );
+
         return;
     }
-
-
-    const section =
-        document.createElement(
-            "div"
-        );
-
-
-    section.className =
-        "detail-section";
-
-
-    const heading =
-        document.createElement(
-            "h4"
-        );
-
-
-    heading.textContent =
-        title;
-
-
-    const list =
-        document.createElement(
-            "ul"
-        );
 
 
     for (
@@ -1083,34 +1237,192 @@ function addDetailSection(
         of items
     ) {
 
-        const listItem =
+        const li =
             document.createElement(
                 "li"
             );
 
 
-        listItem.textContent =
+        li.textContent =
             String(
                 item
             );
 
 
         list.appendChild(
-            listItem
+            li
         );
     }
 
 
-    section.append(
-        heading,
-        list
-    );
-
-
-    parent.appendChild(
-        section
+    section.classList.remove(
+        "hidden"
     );
 }
+
+
+/* ========================================================
+   ALTERNATIVES
+   ======================================================== */
+
+function renderAlternatives(
+    alternatives
+) {
+
+    const section =
+        document.getElementById(
+            "alternativesSection"
+        );
+
+
+    const container =
+        document.getElementById(
+            "alternativesContainer"
+        );
+
+
+    container.replaceChildren();
+
+
+    if (
+        !Array.isArray(
+            alternatives
+        )
+        ||
+        alternatives.length === 0
+    ) {
+
+        section.classList.add(
+            "hidden"
+        );
+
+        return;
+    }
+
+
+    for (
+        const alternative
+        of alternatives
+    ) {
+
+        const card =
+            document.createElement(
+                "div"
+            );
+
+
+        card.className =
+            "alternative-card";
+
+
+        const header =
+            document.createElement(
+                "div"
+            );
+
+
+        header.className =
+            "alternative-header";
+
+
+        const moduleId =
+            document.createElement(
+                "span"
+            );
+
+
+        moduleId.className =
+            "alternative-module";
+
+
+        moduleId.textContent =
+            alternative.module_id;
+
+
+        const status =
+            document.createElement(
+                "span"
+            );
+
+
+        status.className =
+            "alternative-status";
+
+
+        status.textContent =
+            alternative.status || "";
+
+
+        header.append(
+            moduleId,
+            status
+        );
+
+
+        card.appendChild(
+            header
+        );
+
+
+        if (
+            alternative.module_name
+        ) {
+
+            const name =
+                document.createElement(
+                    "div"
+                );
+
+
+            name.className =
+                "alternative-name";
+
+
+            name.textContent =
+                alternative.module_name;
+
+
+            card.appendChild(
+                name
+            );
+        }
+
+
+        if (
+            alternative.choose_when
+        ) {
+
+            const chooseWhen =
+                document.createElement(
+                    "p"
+                );
+
+
+            chooseWhen.className =
+                "alternative-choose-when";
+
+
+            chooseWhen.textContent =
+                alternative.choose_when;
+
+
+            card.appendChild(
+                chooseWhen
+            );
+        }
+
+
+        container.appendChild(
+            card
+        );
+    }
+
+
+    section.classList.remove(
+        "hidden"
+    );
+}
+
 
 
 /* ========================================================
