@@ -1001,3 +1001,282 @@ footer {
     }
 
 }
+
+/* =========================================================
+   LESSON 2E - MODULE COMPARISON
+   ========================================================= */
+
+
+.comparison-launcher {
+    max-width: 900px;
+
+    margin: 34px auto 0;
+
+    padding: 28px;
+
+    background: white;
+
+    border: 1px solid #dde4e0;
+
+    border-radius: 12px;
+
+    text-align: left;
+}
+
+
+.comparison-launcher-header h3 {
+    margin: 0;
+
+    font-size: 24px;
+}
+
+
+.comparison-launcher-header p {
+    color: #68726d;
+
+    line-height: 1.5;
+}
+
+
+.comparison-choices {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap: 12px;
+
+    margin-top: 22px;
+}
+
+
+.comparison-choice {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 12px;
+
+    padding: 16px;
+
+    border: 1px solid #dce3df;
+
+    border-radius: 9px;
+
+    background: #fafcfb;
+
+    cursor: pointer;
+}
+
+
+.comparison-choice:hover {
+    border-color: #88a795;
+}
+
+
+.comparison-choice input {
+    margin-top: 4px;
+}
+
+
+.comparison-choice-content {
+    flex: 1;
+}
+
+
+.comparison-choice-id {
+    font-weight: bold;
+
+    color: #28332d;
+}
+
+
+.comparison-choice-name {
+    margin-top: 4px;
+
+    color: #707975;
+
+    font-size: 13px;
+}
+
+
+.comparison-choice-status {
+    display: inline-block;
+
+    margin-top: 8px;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    color: #567063;
+
+    text-transform: uppercase;
+}
+
+
+.comparison-actions {
+    margin-top: 22px;
+}
+
+
+.comparison-panel {
+    max-width: 1100px;
+
+    margin: 34px auto 0;
+
+    padding: 28px;
+
+    background: white;
+
+    border: 1px solid #dde4e0;
+
+    border-radius: 12px;
+
+    text-align: left;
+}
+
+
+.comparison-panel-header h3 {
+    margin-top: 0;
+
+    font-size: 25px;
+}
+
+
+.comparison-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+
+    margin-top: 24px;
+}
+
+
+.comparison-table {
+    width: 100%;
+
+    min-width: 680px;
+
+    border-collapse: collapse;
+}
+
+
+.comparison-table th,
+.comparison-table td {
+    padding: 15px;
+
+    border-bottom:
+        1px solid #e2e7e4;
+
+    vertical-align: top;
+
+    text-align: left;
+}
+
+
+.comparison-table thead th {
+    background: #f5f8f6;
+}
+
+
+.comparison-attribute-header {
+    min-width: 190px;
+
+    color: #66706b;
+
+    font-size: 12px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.5px;
+}
+
+
+.comparison-module-heading {
+    min-width: 185px;
+}
+
+
+.comparison-module-id {
+    display: block;
+
+    color: #202b25;
+
+    font-size: 17px;
+
+    font-weight: bold;
+}
+
+
+.comparison-module-name {
+    display: block;
+
+    margin-top: 5px;
+
+    color: #707975;
+
+    font-size: 12px;
+
+    font-weight: normal;
+}
+
+
+.comparison-row-label {
+    color: #4d5953;
+
+    font-weight: bold;
+}
+
+
+.comparison-group-row td {
+    padding-top: 25px;
+
+    background: #fafcfb;
+
+    color: #52705f;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.8px;
+}
+
+
+.fit-compatible {
+    color: #19703b;
+
+    font-weight: bold;
+}
+
+
+.fit-clarification {
+    color: #886300;
+
+    font-weight: bold;
+}
+
+
+.fit-not-suitable {
+    color: #962f2f;
+
+    font-weight: bold;
+}
+
+
+@media (max-width: 700px) {
+
+    .comparison-choices {
+        grid-template-columns: 1fr;
+    }
+
+}

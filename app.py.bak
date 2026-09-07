@@ -553,9 +553,7 @@ def build_sales_view(decision, recommendation, top_candidate, ranked_results, mo
         "alternatives": alternatives,
     }    
     
-def build_recommendation_result(
-    requirement,
-):
+def build_recommendation_result(requirement):
     """
     Evaluate the completed customer requirement against
     the Unisem module portfolio.
@@ -563,140 +561,383 @@ def build_recommendation_result(
     Lesson 2D additionally creates a salesperson-friendly
     presentation model without changing selection logic.
     """
-
-    module_data = load_json_file(
-        "modules.json"
-    )
-
-
-    modules = extract_modules(
-        module_data
-    )
-
-
+    module_data = load_json_file("modules.json")
+    modules = extract_modules(module_data)
     # --------------------------------------------------------
     # Lesson 1 selection engine
     # --------------------------------------------------------
-
-    results = evaluate_portfolio(
-        requirement,
-        modules,
-    )
-
-
-    requirement_summary = (
-        summarize_requirement(
-            requirement
-        )
-    )
-
-
-    top_candidate = (
-        results[0]
-        if results
-        else None
-    )
-
-
+    results = evaluate_portfolio(requirement, modules)
+    requirement_summary = (summarize_requirement(requirement))
+    top_candidate = (results[0] if results else None)
     recommendation = None
-
-
     # --------------------------------------------------------
     # Preserve Lesson 2C decision rules
     # --------------------------------------------------------
-
     if top_candidate is None:
-
-        decision = (
-            "no_suitable_module"
-        )
-
-
-    elif (
-        top_candidate.get(
-            "status"
-        )
-        == "COMPATIBLE"
-    ):
-
-        decision = (
-            "recommended"
-        )
-
-
-        recommendation = (
-            top_candidate
-        )
-
-
-    elif (
-        top_candidate.get(
-            "status"
-        )
-        == "NEEDS_CLARIFICATION"
-    ):
-
-        decision = (
-            "clarification_required"
-        )
-
-
+        decision = ("no_suitable_module")
+    elif (top_candidate.get("status") == "COMPATIBLE"):
+        decision = ("recommended")
+        recommendation = (top_candidate)
+    elif (top_candidate.get("status") == "NEEDS_CLARIFICATION"):
+        decision = ("clarification_required")
     else:
-
-        decision = (
-            "no_suitable_module"
-        )
-
+        decision = ("no_suitable_module")
 
     # --------------------------------------------------------
     # Lesson 2D presentation adapter
     # --------------------------------------------------------
+    sales_view = (build_sales_view(decision= decision,recommendation=recommendation,top_candidate=top_candidate,
+            ranked_results=results, modules=modules))
+    return {
+        "state": "complete",
+        "decision": decision,
+        "requirement": requirement,
+        "requirement_summary": requirement_summary,
+        "recommendation": recommendation,
+        "top_candidate": top_candidate,
+        "ranked_results": results,
+        "sales_view": sales_view,
+    }
+    
+    
+ # ============================================================
+# Lesson 2E - Module comparison helpers
+# ============================================================
 
-    sales_view = (
-        build_sales_view(
-            decision=
-                decision,
 
-            recommendation=
-                recommendation,
+def comparison_display_value(value):
+    """
+    Convert a raw portfolio value into concise display text.
+    """
+    if value is None:
+        return None
 
-            top_candidate=
-                top_candidate,
+    if isinstance(value, bool):
+        return ("Yes" if value else "No")
 
-            ranked_results=
-                results,
+    if isinstance(value, list):
+        if not value:
+            return None
+        return ", ".join(str(item) for item in value)
+    if isinstance(value, tuple):
+        if not value:
+            return None
+        return ", ".join(str(item) for item in value)
+    if isinstance(value, dict):
+        if not value:
+            return None
+        pieces = []
+        for (key,item) in value.items():
+            pieces.append(f"{pretty_token(key)}: {item}")
+        return "; ".join(pieces)
+    text = str(value).strip()
+    if not text:
+        return None
+    return text
+    
+    
+def first_module_value(module,*keys):
+    """
+    Return the first useful portfolio field from a module.
+    """
+    if not isinstance(module, dict):
+        return None
+    for key in keys:
+        if key not in module:
+            continue
+        value = module[key]
+        if value is None:
+            continue
+        if value == "":
+            continue
+        return value
+    return None
+    
+    
+ COMPARISON_FIELDS = [
 
-            modules=
-                modules,
-        )
+    (
+        "family",
+        "Module Family",
+        (
+            "family",
+            "module_family",
+        ),
+    ),
+
+    (
+        "wifi",
+        "Wi-Fi",
+        (
+            "wifi",
+            "supports_wifi",
+        ),
+    ),
+
+    (
+        "wifi_generation",
+        "Wi-Fi Generation",
+        (
+            "wifi_generation",
+            "wifi_standard",
+            "wifi_version",
+        ),
+    ),
+
+    (
+        "ble",
+        "Bluetooth Low Energy",
+        (
+            "ble",
+            "bluetooth_le",
+            "bluetooth_low_energy",
+        ),
+    ),
+
+    (
+        "bluetooth_classic",
+        "Bluetooth Classic",
+        (
+            "bluetooth_classic",
+            "bt_classic",
+        ),
+    ),
+
+    (
+        "bluetooth_version",
+        "Bluetooth Version",
+        (
+            "bluetooth_version",
+            "bt_version",
+        ),
+    ),
+
+    (
+        "host_interfaces",
+        "Host Interface",
+        (
+            "host_interfaces",
+            "host_interface",
+            "interfaces",
+        ),
+    ),
+
+    (
+        "antenna",
+        "Antenna",
+        (
+            "antenna",
+            "antenna_options",
+            "antenna_type",
+        ),
+    ),
+
+    (
+        "temperature",
+        "Operating Temperature",
+        (
+            "operating_temperature",
+            "temperature_range",
+            "operating_temp",
+        ),
+    ),
+
+    (
+        "dimensions",
+        "Dimensions",
+        (
+            "dimensions",
+            "size",
+            "module_size",
+        ),
+    ),
+
+    (
+        "certifications",
+        "Certifications",
+        (
+            "certifications",
+            "certification",
+            "approvals",
+        ),
+    ),
+
+]
+
+
+def build_comparison_module(module_record, engine_result):
+    """
+    Create the header information for one module in the
+    comparison table.
+    """
+    module_id = (get_module_identifier(module_record))
+    if module_id is None:
+        module_id = first_present(engine_result, "module_id", "id", "part_number")
+
+    module_name = first_present(engine_result, "module_name", "name")
+    if module_name is None:
+        module_name = first_present(module_record, "module_name", "name", "product_name", "marketing_name")
+    status = first_present(engine_result, "status")
+    choose_when = first_present(engine_result, "choose_when", "recommended_for", "positioning")
+
+    if choose_when is None:
+        choose_when = first_present(module_record, "choose_when", "recommended_for", "positioning")
+
+    return {
+        "module_id": str(module_id),
+        "module_name": str(module_name or ""),
+        "status": str(status or "" ),
+        "choose_when": str(choose_when or ""),
+    }
+    
+    
+def build_comparison_view(selected_module_ids, modules, ranked_results):
+    """
+    Build a side-by-side comparison model.
+
+    Selection/ranking has already happened in the
+    Lesson 1 engine. This function only presents it.
+    """
+    results_by_id = {}
+    for result in ranked_results:
+        result_id = first_present(result, "module_id", "id", "part_number", "part_no")
+        if result_id is None:
+            continue
+        results_by_id[str(result_id)] = result
+    comparison_modules = []
+    module_records = {}
+
+    # --------------------------------------------------------
+    # Resolve requested modules
+    # --------------------------------------------------------
+    for module_id in selected_module_ids:
+        module_id = str(module_id)
+        module_record = (find_module_record(modules, module_id))
+        engine_result = (results_by_id.get(module_id))
+        if module_record is None:
+            raise ValueError("Unknown module requested for comparison: "+ module_id)
+        if engine_result is None:
+            raise ValueError(
+                "Module was not evaluated by the "
+                "selection engine: "
+                + module_id
+            )
+        module_records[module_id] = module_record
+        comparison_modules.append(build_comparison_module(module_record, engine_result))
+    rows = []
+
+    # --------------------------------------------------------
+    # Engine evaluation rows
+    # --------------------------------------------------------
+
+    status_values = {}
+    passed_values = {}
+    clarification_values = {}
+    conflict_values = {}
+    for module_info in comparison_modules:
+        module_id = (module_info["module_id"])
+        result = (results_by_id[module_id])
+        status_values[module_id] = (result.get("status", ""))
+        passed_values[module_id] = str(len(to_text_list(first_present(result,"passed_requirements",
+                        "matched_requirements","requirements_satisfied"))))
+        clarification_values[module_id] = str(len(to_text_list(first_present(result, "clarifications",
+                        "clarification_items"))))
+        conflict_values[module_id] = str(len(to_text_list(first_present(result,"hard_failures","conflicts",
+                        "failed_requirements"))))
+    rows.append(
+        {
+            "key": "fit_status",
+            "label": "Customer Fit",
+            "group": "Evaluation",
+            "values": status_values,
+        }
+    )
+    rows.append(
+        {
+            "key": "requirements_satisfied",
+            "label": "Requirements Satisfied",
+            "group": "Evaluation",
+            "values": passed_values,
+        }
+    )
+
+    rows.append(
+        {
+            "key": "clarifications",
+            "label": "Clarifications",
+            "group": "Evaluation",
+            "values": clarification_values,
+        }
+    )
+
+    rows.append(
+        {
+            "key": "conflicts",
+            "label": "Conflicts",
+            "group": "Evaluation",
+            "values": conflict_values,
+        }
     )
 
 
+    # --------------------------------------------------------
+    # Portfolio specification rows
+    # --------------------------------------------------------
+
+    for (field_key, field_label, possible_keys) in COMPARISON_FIELDS:
+        values = {}
+        any_value_found = False
+        for module_info in comparison_modules:
+            module_id = (module_info["module_id"])
+            module_record = (module_records[module_id])
+            raw_value = (first_module_value(module_record,*possible_keys))
+            display_value = (comparison_display_value(raw_value))
+            if display_value is not None:
+                any_value_found = True
+            values[module_id] = (display_value or "—")
+        # Do not create empty specification rows.
+        if not any_value_found:
+            continue
+        rows.append(
+            {
+                "key": field_key,
+                "label": field_label,
+                "group": "Specifications",
+                "values": values,
+            }
+        )
+
     return {
-        "state":
-            "complete",
-
-        "decision":
-            decision,
-
-        "requirement":
-            requirement,
-
-        "requirement_summary":
-            requirement_summary,
-
-        "recommendation":
-            recommendation,
-
-        "top_candidate":
-            top_candidate,
-
-        "ranked_results":
-            results,
-
-        "sales_view":
-            sales_view,
+        "modules": comparison_modules,
+        "rows": rows,
     }
+    
+    
+def requirement_from_answers(answers):
+    """
+    Replay browser answers through QuestionSession and
+    return the completed requirement.
+
+    Comparison is therefore always based on the same
+    Lesson 1 decision logic as recommendation.
+    """
+    if not isinstance(answers, list):
+        raise ValueError("'answers' must be a JSON list")
+    tree = load_json_file("question_tree.json")
+    session = QuestionSession(tree)
+    for answer in answers:
+        if session.is_complete():
+            raise ValueError(
+                "Answers were supplied after "
+                "questionnaire completion"
+            )
+        session.answer(answer)
+    if not session.is_complete():
+        raise ValueError(
+            "The questionnaire must be completed "
+            "before comparing modules"
+        )
+    return session.get_requirement()
 # ============================================================
 # Question-tree normalization
 # ============================================================
@@ -1185,6 +1426,110 @@ def api_wizard():
                     "The recommendation engine "
                     "encountered an unexpected error"
                 ),
+            }
+        ), 500
+        
+        
+        
+@app.post("/api/compare")
+def api_compare_modules():
+    """
+    Compare one or more evaluated modules against the
+    completed customer requirement.
+
+    One module is allowed so the current single-module
+    portfolio can use the same UI as a detailed
+    specification view.
+
+    Up to four modules may be displayed side-by-side.
+    """
+
+    try:
+
+        payload = request.get_json(silent=True)
+        if payload is None:
+            payload = {}
+        answers = payload.get("answers", [])
+        module_ids = payload.get("module_ids", [])
+        if not isinstance(module_ids, list):
+            return jsonify(
+                {
+                    "status": "error",
+                    "error": (
+                        "'module_ids' must "
+                        "be a JSON list"
+                    ),
+                }
+            ), 400
+        # Remove duplicates while preserving order.
+        normalized_ids = []
+        seen = set()
+        for module_id in module_ids:
+            text = str(module_id)
+            if text in seen:
+                continue
+            seen.add(text)
+            normalized_ids.append(text)
+        if len(normalized_ids) == 0:
+            return jsonify(
+                {
+                    "status": "error",
+                    "error": (
+                        "Select at least one module "
+                        "for comparison"
+                    ),
+                }
+            ), 400
+        if len(normalized_ids) > 4:
+            return jsonify(
+                {
+                    "status": "error",
+                    "error": (
+                        "A maximum of four modules "
+                        "may be compared at once"
+                    ),
+                }
+            ), 400
+
+        # ----------------------------------------------------
+        # Reconstruct authoritative requirement
+        # ----------------------------------------------------
+        requirement = (requirement_from_answers(answers))
+        # ----------------------------------------------------
+        # Re-run selection engine
+        # ----------------------------------------------------
+
+        module_data = (load_json_file("modules.json"))
+        modules = (extract_modules(module_data))
+        ranked_results = (evaluate_portfolio(requirement, modules))
+        comparison = (build_comparison_view(selected_module_ids=normalized_ids, modules= modules,
+                      ranked_results=ranked_results))
+        return jsonify(
+            {
+                "status": "ok",
+                "comparison": comparison,
+            }
+        )
+
+
+    except (QuestionTreeError, ValueError,TypeError,KeyError) as exc:
+        return jsonify(
+            {
+                "status": "error",
+                "error": str(exc),
+            }
+        ), 400
+
+
+    except Exception as exc:
+
+        print("Unexpected comparison error:", repr(exc))
+        return jsonify(
+            {
+                "status": "error",
+                "error": ("The module comparison "
+                        "could not be generated"
+                    ),
             }
         ), 500
 # ============================================================

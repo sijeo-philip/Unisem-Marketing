@@ -7,7 +7,9 @@ const wizardState = {
 
     displayAnswers: [],
 
-    currentQuestion: null
+    currentQuestion: null, 
+	
+	completeResult: null
 };
 
 
@@ -206,7 +208,29 @@ async function startWizard() {
 
     wizardState.currentQuestion =
         null;
+	
+	wizardState.completeResult =
+    null;
 
+
+	document
+		.getElementById(
+			"comparisonLauncher"
+		)
+		.classList
+		.add(
+			"hidden"
+		);
+
+
+	document
+		.getElementById(
+			"comparisonPanel"
+		)
+		.classList
+		.add(
+			"hidden"
+		);
 
     hideWizardError();
 
@@ -776,7 +800,7 @@ async function submitAnswer(
 function completeWizard(
     data
 ) {
-
+	wizardState.completeResult = data;
     document
         .getElementById(
             "questionArea"
@@ -808,6 +832,9 @@ function completeWizard(
     renderRecommendation(
         data
     );
+	configureComparison(
+    data
+	);
 }
 
 
@@ -963,6 +990,829 @@ function renderRecommendation(
     );
 }
 
+
+/* ========================================================
+   LESSON 2E
+   MODULE COMPARISON SELECTOR
+   ======================================================== */
+
+
+function configureComparison(
+    data
+) {
+
+    const results =
+        data.ranked_results;
+
+
+    const launcher =
+        document.getElementById(
+            "comparisonLauncher"
+        );
+
+
+    const choices =
+        document.getElementById(
+            "comparisonChoices"
+        );
+
+
+    const button =
+        document.getElementById(
+            "compareModulesButton"
+        );
+
+
+    const title =
+        document.getElementById(
+            "comparisonLauncherTitle"
+        );
+
+
+    const text =
+        document.getElementById(
+            "comparisonLauncherText"
+        );
+
+
+    choices.replaceChildren();
+
+
+    if (
+        !Array.isArray(
+            results
+        )
+        ||
+        results.length === 0
+    ) {
+
+        launcher.classList.add(
+            "hidden"
+        );
+
+        return;
+    }
+
+
+    launcher.classList.remove(
+        "hidden"
+    );
+
+
+    if (
+        results.length === 1
+    ) {
+
+        title.textContent =
+            "View Module Details";
+
+
+        text.textContent =
+            "The current portfolio contains one "
+            + "evaluated module. View its customer-fit "
+            + "and portfolio specifications.";
+
+
+        button.textContent =
+            "View Module Details";
+
+    } else {
+
+        title.textContent =
+            "Compare Modules";
+
+
+        text.textContent =
+            "Select up to four evaluated modules "
+            + "for side-by-side comparison.";
+
+
+        button.textContent =
+            "Compare Selected Modules";
+    }
+
+
+    for (
+        let index = 0;
+        index < results.length;
+        index++
+    ) {
+
+        const result =
+            results[index];
+
+
+        const moduleId =
+            getResultModuleId(
+                result
+            );
+
+
+        if (!moduleId) {
+            continue;
+        }
+
+
+        const choice =
+            buildComparisonChoice(
+                result,
+                moduleId,
+                index === 0
+            );
+
+
+        choices.appendChild(
+            choice
+        );
+    }
+
+
+    button.onclick =
+        requestComparison;
+}
+
+function getResultModuleId(
+    result
+) {
+
+    return (
+        result.module_id
+        ||
+        result.id
+        ||
+        result.part_number
+        ||
+        result.part_no
+        ||
+        null
+    );
+}
+
+function enforceComparisonLimit(
+    event
+) {
+
+    const checked =
+        Array.from(
+            document.querySelectorAll(
+                ".comparison-module-checkbox:checked"
+            )
+        );
+
+
+    if (
+        checked.length <= 4
+    ) {
+
+        return;
+    }
+
+
+    event.target.checked =
+        false;
+
+
+    showComparisonError(
+        "A maximum of four modules "
+        + "may be compared at once."
+    );
+}
+
+async function requestComparison() {
+
+    hideComparisonError();
+
+
+    const selected =
+        Array.from(
+            document.querySelectorAll(
+                ".comparison-module-checkbox:checked"
+            )
+        )
+        .map(
+            checkbox =>
+                checkbox.value
+        );
+
+
+    if (
+        selected.length === 0
+    ) {
+
+        showComparisonError(
+            "Select at least one module."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/compare",
+                {
+                    method:
+                        "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(
+                            {
+                                answers:
+                                    wizardState
+                                        .engineAnswers,
+
+                                module_ids:
+                                    selected
+                            }
+                        )
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error
+                ||
+                (
+                    "Comparison API returned HTTP "
+                    + response.status
+                )
+            );
+        }
+
+
+        if (
+            data.status !== "ok"
+        ) {
+
+            throw new Error(
+                data.error
+                ||
+                "Unable to compare modules"
+            );
+        }
+
+
+        renderComparison(
+            data.comparison
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Comparison error:",
+            error
+        );
+
+
+        showComparisonError(
+            error.message
+        );
+    }
+}
+
+function renderComparison(
+    comparison
+) {
+
+    const panel =
+        document.getElementById(
+            "comparisonPanel"
+        );
+
+
+    const table =
+        document.getElementById(
+            "comparisonTable"
+        );
+
+
+    table.replaceChildren();
+
+
+    const modules =
+        comparison.modules || [];
+
+
+    const rows =
+        comparison.rows || [];
+
+
+    if (
+        modules.length === 0
+    ) {
+
+        showComparisonError(
+            "No modules were returned "
+            + "for comparison."
+        );
+
+        return;
+    }
+
+
+    renderComparisonHeader(
+        table,
+        modules
+    );
+
+
+    renderComparisonRows(
+        table,
+        modules,
+        rows
+    );
+
+
+    panel.classList.remove(
+        "hidden"
+    );
+
+
+    panel.scrollIntoView(
+        {
+            behavior: "smooth",
+
+            block: "start"
+        }
+    );
+}
+
+function renderComparisonHeader(
+    table,
+    modules
+) {
+
+    const thead =
+        document.createElement(
+            "thead"
+        );
+
+
+    const row =
+        document.createElement(
+            "tr"
+        );
+
+
+    const featureHeader =
+        document.createElement(
+            "th"
+        );
+
+
+    featureHeader.className =
+        "comparison-attribute-header";
+
+
+    featureHeader.textContent =
+        "Attribute";
+
+
+    row.appendChild(
+        featureHeader
+    );
+
+
+    for (
+        const module
+        of modules
+    ) {
+
+        const th =
+            document.createElement(
+                "th"
+            );
+
+
+        th.className =
+            "comparison-module-heading";
+
+
+        const id =
+            document.createElement(
+                "span"
+            );
+
+
+        id.className =
+            "comparison-module-id";
+
+
+        id.textContent =
+            module.module_id;
+
+
+        const name =
+            document.createElement(
+                "span"
+            );
+
+
+        name.className =
+            "comparison-module-name";
+
+
+        name.textContent =
+            module.module_name || "";
+
+
+        th.appendChild(
+            id
+        );
+
+
+        if (
+            module.module_name
+        ) {
+
+            th.appendChild(
+                name
+            );
+        }
+
+
+        row.appendChild(
+            th
+        );
+    }
+
+
+    thead.appendChild(
+        row
+    );
+
+
+    table.appendChild(
+        thead
+    );
+}
+
+function renderComparisonRows(
+    table,
+    modules,
+    rows
+) {
+
+    const tbody =
+        document.createElement(
+            "tbody"
+        );
+
+
+    let currentGroup =
+        null;
+
+
+    for (
+        const comparisonRow
+        of rows
+    ) {
+
+        if (
+            comparisonRow.group
+            !== currentGroup
+        ) {
+
+            currentGroup =
+                comparisonRow.group;
+
+
+            const groupRow =
+                document.createElement(
+                    "tr"
+                );
+
+
+            groupRow.className =
+                "comparison-group-row";
+
+
+            const cell =
+                document.createElement(
+                    "td"
+                );
+
+
+            cell.colSpan =
+                modules.length + 1;
+
+
+            cell.textContent =
+                currentGroup;
+
+
+            groupRow.appendChild(
+                cell
+            );
+
+
+            tbody.appendChild(
+                groupRow
+            );
+        }
+
+
+        const row =
+            document.createElement(
+                "tr"
+            );
+
+
+        const label =
+            document.createElement(
+                "td"
+            );
+
+
+        label.className =
+            "comparison-row-label";
+
+
+        label.textContent =
+            comparisonRow.label;
+
+
+        row.appendChild(
+            label
+        );
+
+
+        for (
+            const module
+            of modules
+        ) {
+
+            const cell =
+                document.createElement(
+                    "td"
+                );
+
+
+            const value =
+                comparisonRow.values[
+                    module.module_id
+                ]
+                ?? "—";
+
+
+            cell.textContent =
+                value;
+
+
+            if (
+                comparisonRow.key ===
+                "fit_status"
+            ) {
+
+                applyFitStatusClass(
+                    cell,
+                    value
+                );
+            }
+
+
+            row.appendChild(
+                cell
+            );
+        }
+
+
+        tbody.appendChild(
+            row
+        );
+    }
+
+
+    table.appendChild(
+        tbody
+    );
+}
+
+function applyFitStatusClass(
+    cell,
+    status
+) {
+
+    const text =
+        String(
+            status
+        )
+        .toUpperCase();
+
+
+    if (
+        text ===
+        "COMPATIBLE"
+    ) {
+
+        cell.classList.add(
+            "fit-compatible"
+        );
+
+    } else if (
+        text ===
+        "NEEDS_CLARIFICATION"
+    ) {
+
+        cell.classList.add(
+            "fit-clarification"
+        );
+
+    } else {
+
+        cell.classList.add(
+            "fit-not-suitable"
+        );
+    }
+}
+function showComparisonError(
+    message
+) {
+
+    const panel =
+        document.getElementById(
+            "comparisonPanel"
+        );
+
+
+    const error =
+        document.getElementById(
+            "comparisonError"
+        );
+
+
+    panel.classList.remove(
+        "hidden"
+    );
+
+
+    error.textContent =
+        message;
+
+
+    error.classList.remove(
+        "hidden"
+    );
+}
+
+
+function hideComparisonError() {
+
+    const error =
+        document.getElementById(
+            "comparisonError"
+        );
+
+
+    error.textContent =
+        "";
+
+
+    error.classList.add(
+        "hidden"
+    );
+}
+
+
+function buildComparisonChoice(
+    result,
+    moduleId,
+    preselected
+) {
+
+    const label =
+        document.createElement(
+            "label"
+        );
+
+
+    label.className =
+        "comparison-choice";
+
+
+    const checkbox =
+        document.createElement(
+            "input"
+        );
+
+
+    checkbox.type =
+        "checkbox";
+
+
+    checkbox.value =
+        moduleId;
+
+
+    checkbox.checked =
+        preselected;
+
+
+    checkbox.className =
+        "comparison-module-checkbox";
+
+
+    checkbox.addEventListener(
+        "change",
+        enforceComparisonLimit
+    );
+
+
+    const content =
+        document.createElement(
+            "div"
+        );
+
+
+    content.className =
+        "comparison-choice-content";
+
+
+    const id =
+        document.createElement(
+            "div"
+        );
+
+
+    id.className =
+        "comparison-choice-id";
+
+
+    id.textContent =
+        moduleId;
+
+
+    const name =
+        document.createElement(
+            "div"
+        );
+
+
+    name.className =
+        "comparison-choice-name";
+
+
+    name.textContent =
+        result.module_name || "";
+
+
+    const status =
+        document.createElement(
+            "div"
+        );
+
+
+    status.className =
+        "comparison-choice-status";
+
+
+    status.textContent =
+        result.status || "";
+
+
+    content.appendChild(
+        id
+    );
+
+
+    if (
+        result.module_name
+    ) {
+
+        content.appendChild(
+            name
+        );
+    }
+
+
+    content.appendChild(
+        status
+    );
+
+
+    label.append(
+        checkbox,
+        content
+    );
+
+
+    return label;
+}
 
 /* ========================================================
    OUTCOME

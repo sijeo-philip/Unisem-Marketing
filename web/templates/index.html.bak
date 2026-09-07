@@ -242,9 +242,190 @@
 
 
     <div
-        id="recommendationPanel"
-        class="recommendation-panel hidden"
+    id="recommendationPanel"
+    class="recommendation-panel hidden"
+>
+
+    <div class="result-top-row">
+
+        <div>
+
+            <p
+                id="moduleRole"
+                class="result-eyebrow"
+            >
+            </p>
+
+            <div
+                id="decisionBadge"
+                class="decision-badge"
+            >
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <h3
+        id="recommendedModule"
+        class="recommended-module"
     >
+    </h3>
+
+
+    <p
+        id="recommendedModuleName"
+        class="recommended-module-name"
+    >
+    </p>
+
+
+    <p
+        id="moduleDescription"
+        class="module-description hidden"
+    >
+    </p>
+
+
+    <h4
+        id="resultHeadline"
+        class="result-headline"
+    >
+    </h4>
+
+
+    <p
+        id="resultSummary"
+        class="result-summary"
+    >
+    </p>
+
+
+    <div
+        id="capabilityChips"
+        class="capability-chips"
+    >
+    </div>
+
+
+    <section
+        id="chooseWhenSection"
+        class="result-section hidden"
+    >
+
+        <h4>
+            When to position this module
+        </h4>
+
+        <p id="chooseWhen">
+        </p>
+
+    </section>
+
+
+    <section
+        id="whySection"
+        class="result-section hidden"
+    >
+
+        <h4>
+            Why this module?
+        </h4>
+
+        <ul
+            id="whyList"
+            class="result-list positive-list"
+        >
+        </ul>
+
+    </section>
+
+
+    <section
+        id="clarificationSection"
+        class="result-section attention-section hidden"
+    >
+
+        <h4>
+            Clarifications to confirm
+        </h4>
+
+        <ul
+            id="clarificationList"
+            class="result-list"
+        >
+        </ul>
+
+    </section>
+
+
+    <section
+        id="conflictSection"
+        class="result-section conflict-section hidden"
+    >
+
+        <h4>
+            Requirement conflicts
+        </h4>
+
+        <ul
+            id="conflictList"
+            class="result-list"
+        >
+        </ul>
+
+    </section>
+
+
+    <section
+        id="preferenceSection"
+        class="result-section hidden"
+    >
+
+        <h4>
+            Additional fit notes
+        </h4>
+
+        <ul
+            id="preferenceList"
+            class="result-list"
+        >
+        </ul>
+
+    </section>
+
+
+    <section class="next-action-card">
+
+        <span class="next-action-label">
+            Recommended next action
+        </span>
+
+        <p id="nextAction">
+        </p>
+
+    </section>
+
+
+    <section
+        id="alternativesSection"
+        class="result-section hidden"
+    >
+
+        <h4>
+            Other evaluated modules
+        </h4>
+
+        <div
+            id="alternativesContainer"
+            class="alternatives-container"
+        >
+        </div>
+
+    </section>
+
+</div>
 
         <div
             id="decisionBadge"
