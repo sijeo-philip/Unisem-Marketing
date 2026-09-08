@@ -42,6 +42,15 @@ def get_base_dir() -> Path:
 
 BASE_DIR = get_base_dir()
 
+# ============================================================
+# Application safety limits
+# ============================================================
+
+MAX_WIZARD_ANSWERS = 64
+
+MAX_COMPARE_MODULES = 4
+
+APPLICATION_VERSION = "2.0-development"
 
 # ============================================================
 # Flask application
@@ -53,6 +62,33 @@ app = Flask(
     static_folder=str(BASE_DIR / "web" / "static"),
 )
 
+
+@app.after_request
+def add_application_headers(response):
+    """
+    Add conservative headers suitable for a local offline
+    browser application.
+    """
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self'; "
+        "style-src 'self'; "
+        "img-src 'self' data:; "
+        "connect-src 'self'; "
+        "object-src 'none'; "
+        "base-uri 'self'; "
+        "frame-ancestors 'none'"
+    )
+    if request.path.startswith("/api/"):
+        response.headers["Cache-Control"] = (
+            "no-store, "
+            "no-cache, "
+            "must-revalidate"
+        )
+    return response
 
 # ============================================================
 # Utility functions
@@ -213,10 +249,76 @@ def normalize_live_question(raw_question,step_number):
         "options": normalized_options,
     }
     
+def get_json_request_object():
+    """
+    Return a validated JSON request object.
+
+    All Lesson 2 POST APIs expect:
+
+        Content-Type: application/json
+
+    and a JSON object such as:
+
+        {
+            "answers": [...]
+        }
+
+    Invalid or malformed requests are rejected instead of
+    being silently converted into an empty dictionary.
+    """
+
+    if not request.is_json:
+        raise ValueError("Request Content-Type must be application/json")
+
+    payload = request.get_json(silent=True)
+    if payload is None:
+        raise ValueError("Request body must contain valid JSON")
+    if not isinstance(payload, dict):
+        raise ValueError("JSON request body must be an object")
+
+    return payload
+
+
+def validate_answer_list(answers):
+    """
+    Validate browser answer history before replaying it
+    through QuestionSession.
+    """
+    if not isinstance(answers,list):
+        raise ValueError("'answers' must be a JSON list")
+    if len(answers) > MAX_WIZARD_ANSWERS:
+        raise ValueError("Too many questionnaire answers were supplied")
+        
+def validate_module_records(
+    modules,
+):
+    """
+    Verify basic module-database integrity.
+
+    The selection engine must never evaluate a portfolio
+    containing duplicate or unidentified module records.
+    """
+
+    if not isinstance(modules,list):
+        raise ValueError("Module portfolio must be a list")
+    if not modules:
+        raise ValueError("Module portfolio is empty")
+    seen_ids = set()
+    for index, module in enumerate(modules):
+        if not isinstance(module,dict):
+            raise ValueError("Invalid module record at index " + str(index))
+        module_id = (get_module_identifier(module))
+        if module_id is None:
+            raise ValueError("Module record at index " + str(index) + " has no module identifier")
+        normalized_id = (str(module_id).strip().lower())
+        if not normalized_id:
+            raise ValueError("Module record contains an empty module identifier")
+        if (normalized_id in seen_ids):
+            raise ValueError("Duplicate module identifier detected: " + str(module_id))
+        seen_ids.add(normalized_id)
 # ============================================================
 # Lesson 2D - Sales presentation helpers
 # ============================================================
-
 def to_text_list(value):
     """
     Convert an optional result field into a clean list of
@@ -563,6 +665,7 @@ def build_recommendation_result(requirement):
     """
     module_data = load_json_file("modules.json")
     modules = extract_modules(module_data)
+    validate_module_records(modules)
     # --------------------------------------------------------
     # Lesson 1 selection engine
     # --------------------------------------------------------
@@ -920,8 +1023,7 @@ def requirement_from_answers(answers):
     Comparison is therefore always based on the same
     Lesson 1 decision logic as recommendation.
     """
-    if not isinstance(answers, list):
-        raise ValueError("'answers' must be a JSON list")
+    validate_answer_list(answers)
     tree = load_json_file("question_tree.json")
     session = QuestionSession(tree)
     for answer in answers:
@@ -1184,6 +1286,34 @@ def normalize_question_tree(raw_tree):
 
     version = first_present(raw_tree, "version", "question_tree_version", "revision" )
     return {"version": version, "start_question_id": str(start_question), "questions": normalized_questions}
+    
+    
+    
+def validate_normalized_question_tree(tree):
+    """
+    Perform structural validation on the browser-facing
+    question-tree representation.
+    """
+    if not isinstance(tree, dict):
+        raise ValueError("Normalized question tree must be an object")
+    questions = tree.get("questions")
+    if not isinstance(questions, list):
+        raise ValueError("Question tree must contain a question list")
+    if not questions:
+        raise ValueError("Question tree contains no questions")
+    ids = []
+    for question in questions:
+        if not isinstance(question, dict):
+            raise ValueError("Question tree contains an invalid question")
+        question_id = question.get("id")
+        if not question_id:
+            raise ValueError("Question is missing an ID")
+        ids.append(str(question_id))
+    if (len(ids) != len(set(ids))):
+        raise ValueError( "Duplicate question IDs detected")
+    start_id = str(tree.get("start_question_id", ""))
+    if (start_id not in ids):
+        raise ValueError("Question-tree start question does not exist: "  + start_id)
 
 # ============================================================
 # Browser routes
@@ -1218,8 +1348,9 @@ def api_health():
         {
             "status": "ok",
             "application": "Unisem Offline Marketing Tool",
+            "application_version":APPLICATION_VERSION,
             "offline": True,
-            "lesson": "2A",
+            "lesson": "2G",
             "modules_database": modules_file is not None,
             "question_tree": question_tree_file is not None,
         }
@@ -1290,6 +1421,7 @@ def api_question_tree():
 
         raw_tree = load_json_file("question_tree.json")
         normalized_tree = (normalize_question_tree(raw_tree))
+        validate_normalized_question_tree(normalized_tree)
         return jsonify({"status": "ok", **normalized_tree})
 
     except FileNotFoundError:
@@ -1330,12 +1462,11 @@ def api_wizard():
     """
 
     try:
-        payload = request.get_json(silent=True)
-        if payload is None:
-            payload = {}
+        payload = (get_json_request_object())
 
         answers = payload.get("answers", [])
-        if not isinstance(answers, list):
+        validate_answer_list(answers)
+        """if not isinstance(answers, list):
             return jsonify(
                 {
                     "status": "error",
@@ -1344,7 +1475,7 @@ def api_wizard():
                         "be a JSON list"
                     ),
                 }
-            ), 400
+            ), 400"""
 
         tree = load_json_file("question_tree.json")
 
@@ -1445,10 +1576,9 @@ def api_compare_modules():
 
     try:
 
-        payload = request.get_json(silent=True)
-        if payload is None:
-            payload = {}
+        payload = (get_json_request_object())
         answers = payload.get("answers", [])
+        validate_answer_list(answers)
         module_ids = payload.get("module_ids", [])
         if not isinstance(module_ids, list):
             return jsonify(
@@ -1479,7 +1609,7 @@ def api_compare_modules():
                     ),
                 }
             ), 400
-        if len(normalized_ids) > 4:
+        if len(normalized_ids) > MAX_COMPARE_MODULES:
             return jsonify(
                 {
                     "status": "error",
@@ -1500,6 +1630,7 @@ def api_compare_modules():
 
         module_data = (load_json_file("modules.json"))
         modules = (extract_modules(module_data))
+        validate_module_records(modules)
         ranked_results = (evaluate_portfolio(requirement, modules))
         comparison = (build_comparison_view(selected_module_ids=normalized_ids, modules= modules,
                       ranked_results=ranked_results))
@@ -1553,4 +1684,6 @@ if __name__ == "__main__":
         host="127.0.0.1",
         port=5000,
         debug=False,
+        use_reloader=False,
+        threaded=True,
     )
