@@ -1280,3 +1280,138 @@ footer {
     }
 
 }
+
+/* =========================================================
+   LESSON 2F - WIZARD NAVIGATION AND SESSION HANDLING
+   ========================================================= */
+
+
+.wizard-navigation {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 14px;
+
+    margin-top: 26px;
+
+    padding-top: 22px;
+
+    border-top: 1px solid #e5e9e7;
+}
+
+
+.secondary-button {
+    padding: 12px 20px;
+
+    border: 1px solid #bfc9c4;
+
+    border-radius: 7px;
+
+    background: white;
+
+    color: #34423b;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+
+.secondary-button:hover:not(:disabled) {
+    border-color: #397850;
+
+    background: #f6faf7;
+}
+
+
+.secondary-button:disabled {
+    opacity: 0.45;
+
+    cursor: not-allowed;
+}
+
+
+.text-button {
+    padding: 10px 12px;
+
+    border: none;
+
+    background: transparent;
+
+    color: #66716c;
+
+    font-size: 14px;
+
+    cursor: pointer;
+}
+
+
+.text-button:hover {
+    color: #246b3c;
+
+    text-decoration: underline;
+}
+
+
+.session-status {
+    margin-top: 8px;
+
+    color: #7b8580;
+
+    font-size: 12px;
+}
+
+
+.completion-actions {
+    display: flex;
+
+    justify-content: center;
+
+    flex-wrap: wrap;
+
+    gap: 14px;
+
+    margin-top: 34px;
+
+    padding-top: 26px;
+
+    border-top: 1px solid #e3e8e5;
+}
+
+
+.wizard-busy {
+    opacity: 0.65;
+
+    pointer-events: none;
+}
+
+
+@media (max-width: 550px) {
+
+    .wizard-navigation {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+
+    .wizard-navigation button {
+        width: 100%;
+    }
+
+
+    .completion-actions {
+        flex-direction: column;
+    }
+
+
+    .completion-actions button {
+        width: 100%;
+    }
+
+}

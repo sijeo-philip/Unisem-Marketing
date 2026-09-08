@@ -9,7 +9,11 @@ const wizardState = {
 
     currentQuestion: null, 
 	
-	completeResult: null
+	completeResult: null,
+	
+	currentStep: 0,
+	
+	busy:false
 };
 
 
@@ -195,52 +199,66 @@ function configureButtons() {
             "click",
             startWizard
         );
+
+
+    document
+        .getElementById(
+            "backButton"
+        )
+        .addEventListener(
+            "click",
+            goBack
+        );
+
+
+    document
+        .getElementById(
+            "restartButton"
+        )
+        .addEventListener(
+            "click",
+            restartWizard
+        );
+
+
+    document
+        .getElementById(
+            "changeAnswersButton"
+        )
+        .addEventListener(
+            "click",
+            changeLastAnswer
+        );
+
+
+    document
+        .getElementById(
+            "newCustomerButton"
+        )
+        .addEventListener(
+            "click",
+            restartWizard
+        );
 }
 
 
 async function startWizard() {
 
-    wizardState.engineAnswers =
-        [];
-
-    wizardState.displayAnswers =
-        [];
-
-    wizardState.currentQuestion =
-        null;
-	
-	wizardState.completeResult =
-    null;
+    resetWizardState();
 
 
-	document
-		.getElementById(
-			"comparisonLauncher"
-		)
-		.classList
-		.add(
-			"hidden"
-		);
+    clearCompletedResults();
 
-
-	document
-		.getElementById(
-			"comparisonPanel"
-		)
-		.classList
-		.add(
-			"hidden"
-		);
 
     hideWizardError();
 
 
     document
         .getElementById(
-            "wizardComplete"
+            "wizardPanel"
         )
         .classList
-        .add(
+        .remove(
             "hidden"
         );
 
@@ -255,14 +273,10 @@ async function startWizard() {
         );
 
 
-    document
-        .getElementById(
-            "wizardPanel"
-        )
-        .classList
-        .remove(
-            "hidden"
-        );
+    updateSessionStatus();
+
+
+    updateNavigationButtons();
 
 
     await requestWizardState();
@@ -274,12 +288,311 @@ async function startWizard() {
         )
         .scrollIntoView(
             {
-                behavior: "smooth"
+                behavior: "smooth",
+
+                block: "start"
+            }
+        );
+}
+/* ========================================================
+   SESSION RESET
+   ======================================================== */
+
+
+function resetWizardState() {
+
+    wizardState.engineAnswers =
+        [];
+
+
+    wizardState.displayAnswers =
+        [];
+
+
+    wizardState.currentQuestion =
+        null;
+
+
+    wizardState.completeResult =
+        null;
+
+
+    wizardState.currentStep =
+        0;
+
+
+    wizardState.busy =
+        false;
+}
+
+function clearCompletedResults() {
+
+    document
+        .getElementById(
+            "wizardComplete"
+        )
+        .classList
+        .add(
+            "hidden"
+        );
+
+
+    document
+        .getElementById(
+            "recommendationPanel"
+        )
+        .classList
+        .add(
+            "hidden"
+        );
+
+
+    document
+        .getElementById(
+            "comparisonLauncher"
+        )
+        .classList
+        .add(
+            "hidden"
+        );
+
+
+    document
+        .getElementById(
+            "comparisonPanel"
+        )
+        .classList
+        .add(
+            "hidden"
+        );
+
+
+    document
+        .getElementById(
+            "comparisonChoices"
+        )
+        .replaceChildren();
+
+
+    document
+        .getElementById(
+            "comparisonTable"
+        )
+        .replaceChildren();
+		
+		document
+    .getElementById(
+        "answerSummary"
+    )
+    .replaceChildren();
+	
+	document.getElementById(
+    "recommendedModule"
+	).textContent = "";
+
+
+	document.getElementById(
+    "recommendedModuleName"
+	).textContent = "";
+
+
+    hideComparisonError();
+}
+
+async function restartWizard() {
+
+    resetWizardState();
+
+
+    clearCompletedResults();
+
+
+    hideWizardError();
+
+
+    document
+        .getElementById(
+            "questionArea"
+        )
+        .classList
+        .remove(
+            "hidden"
+        );
+
+
+    updateSessionStatus();
+
+
+    updateNavigationButtons();
+
+
+    await requestWizardState();
+
+
+    document
+        .getElementById(
+            "wizardPanel"
+        )
+        .scrollIntoView(
+            {
+                behavior: "smooth",
+
+                block: "start"
             }
         );
 }
 
+/* ========================================================
+   BACK NAVIGATION
+   ======================================================== */
 
+
+async function goBack() {
+
+    if (
+        wizardState.busy
+    ) {
+
+        return;
+    }
+
+
+    if (
+        wizardState.engineAnswers.length
+        === 0
+    ) {
+
+        return;
+    }
+
+
+    clearCompletedResults();
+
+
+    wizardState.engineAnswers.pop();
+
+
+    wizardState.displayAnswers.pop();
+
+
+    wizardState.completeResult =
+        null;
+
+
+    document
+        .getElementById(
+            "questionArea"
+        )
+        .classList
+        .remove(
+            "hidden"
+        );
+
+
+    updateSessionStatus();
+
+
+    updateNavigationButtons();
+
+
+    await requestWizardState();
+}
+
+async function changeLastAnswer() {
+
+    if (
+        wizardState.engineAnswers.length
+        === 0
+    ) {
+
+        await restartWizard();
+
+        return;
+    }
+
+
+    await goBack();
+}
+
+
+function updateNavigationButtons() {
+
+    const backButton =
+        document.getElementById(
+            "backButton"
+        );
+
+
+    backButton.disabled =
+        (
+            wizardState
+                .engineAnswers
+                .length
+            === 0
+        )
+        ||
+        wizardState.busy;
+}
+
+function updateSessionStatus() {
+
+    const count =
+        wizardState
+            .engineAnswers
+            .length;
+
+
+    const element =
+        document.getElementById(
+            "sessionStatus"
+        );
+
+
+    if (
+        count === 1
+    ) {
+
+        element.textContent =
+            "1 answer captured";
+
+    } else {
+
+        element.textContent =
+            count
+            + " answers captured";
+    }
+}
+
+function setWizardBusy(
+    busy
+) {
+
+    wizardState.busy =
+        busy;
+
+
+    const questionArea =
+        document.getElementById(
+            "questionArea"
+        );
+
+
+    if (busy) {
+
+        questionArea.classList.add(
+            "wizard-busy"
+        );
+
+    } else {
+
+        questionArea.classList.remove(
+            "wizard-busy"
+        );
+    }
+
+
+    updateNavigationButtons();
+}
 /* ========================================================
    COMMUNICATE WITH QUESTIONSESSION
    ======================================================== */
@@ -287,6 +600,11 @@ async function startWizard() {
 async function requestWizardState() {
 
     hideWizardError();
+
+
+    setWizardBusy(
+        true
+    );
 
 
     document.getElementById(
@@ -327,19 +645,23 @@ async function requestWizardState() {
         if (!response.ok) {
 
             throw new Error(
-                data.error ||
+                data.error
+                ||
                 (
-                    "Wizard API returned HTTP " +
-                    response.status
+                    "Wizard API returned HTTP "
+                    + response.status
                 )
             );
         }
 
 
-        if (data.status !== "ok") {
+        if (
+            data.status !== "ok"
+        ) {
 
             throw new Error(
-                data.error ||
+                data.error
+                ||
                 "Recommendation engine error"
             );
         }
@@ -355,7 +677,8 @@ async function requestWizardState() {
                 data.step
             );
 
-            return;
+
+            return true;
         }
 
 
@@ -368,7 +691,8 @@ async function requestWizardState() {
                 data
             );
 
-            return;
+
+            return true;
         }
 
 
@@ -389,6 +713,19 @@ async function requestWizardState() {
         showWizardError(
             error.message
         );
+
+
+        return false;
+    }
+
+    finally {
+
+        setWizardBusy(
+            false
+        );
+
+
+        updateSessionStatus();
     }
 }
 
@@ -404,7 +741,9 @@ function renderQuestion(
 
     wizardState.currentQuestion =
         question;
-
+	
+	wizardState.currentStep =
+    step;
 
     const questionArea =
         document.getElementById(
@@ -475,6 +814,10 @@ function renderQuestion(
             container
         );
     }
+	
+	updateSessionStatus();
+
+	updateNavigationButtons();
 }
 
 
@@ -769,8 +1112,19 @@ async function submitAnswer(
     displayLabel
 ) {
 
+    if (
+        wizardState.busy
+    ) {
+
+        return;
+    }
+
+
     const question =
         wizardState.currentQuestion;
+
+
+    clearCompletedResults();
 
 
     wizardState.engineAnswers.push(
@@ -789,9 +1143,30 @@ async function submitAnswer(
     );
 
 
-    await requestWizardState();
-}
+    updateSessionStatus();
 
+
+    updateNavigationButtons();
+
+
+    const success =
+        await requestWizardState();
+
+
+    if (!success) {
+
+        wizardState.engineAnswers.pop();
+
+
+        wizardState.displayAnswers.pop();
+
+
+        updateSessionStatus();
+
+
+        updateNavigationButtons();
+    }
+}
 
 /* ========================================================
    COMPLETION
@@ -801,6 +1176,8 @@ function completeWizard(
     data
 ) {
 	wizardState.completeResult = data;
+	wizardState.currentQuestion =
+    null;
     document
         .getElementById(
             "questionArea"
@@ -835,6 +1212,10 @@ function completeWizard(
 	configureComparison(
     data
 	);
+	
+	updateSessionStatus();
+
+	updateNavigationButtons();
 }
 
 
