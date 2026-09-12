@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Unisem Module Recommendation
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/recommendation.css'
+        ) }}"
+    >
+</head>
+
+<body>
+
+<div class="page">
+
+    <header class="page-header">
+
+        <div>
+            <div class="brand">
+                UNISEM MODULES
+            </div>
+
+            <h1>
+                Customer Requirement Analysis
+            </h1>
+
+            <p class="subtitle">
+                Module recommendation based on
+                the customer requirements collected.
+            </p>
+        </div>
+
+    </header>
+
+
+    {% if view.has_recommendation %}
+
+    {% set recommended =
+        view.explanation.recommended
+    %}
+
+    <section class="recommendation-card">
+
+        <div class="recommendation-label">
+            RECOMMENDED MODULE
+        </div>
+
+        <div class="recommendation-main">
+
+            <div>
+
+                <h2>
+                    {{ recommended.module_id }}
+                </h2>
+
+                <p class="recommendation-summary">
+                    {{ recommended.summary }}
+                </p>
+
+            </div>
+
+            <div class="score-box">
+
+                <div class="score">
+                    {{ recommended.match_percent }}%
+                </div>
+
+                <div class="score-label">
+                    {{ recommended.match_strength }}
+                    Match
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {% if recommended.strengths %}
+
+        <div class="section-block">
+
+            <h3>
+                Why we recommend it
+            </h3>
+
+            <ul class="strength-list">
+
+                {% for reason
+                    in recommended.strengths %}
+
+                <li>
+                    {{ reason }}
+                </li>
+
+                {% endfor %}
+
+            </ul>
+
+        </div>
+
+        {% endif %}
+
+
+        {% if recommended.tradeoffs %}
+
+        <div class="section-block">
+
+            <h3>
+                Considerations
+            </h3>
+
+            <ul class="tradeoff-list">
+
+                {% for tradeoff
+                    in recommended.tradeoffs %}
+
+                <li>
+                    {{ tradeoff }}
+                </li>
+
+                {% endfor %}
+
+            </ul>
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+
+    {% if view.explanation.alternatives %}
+
+    <section class="section">
+
+        <div class="section-heading">
+
+            <div>
+                <h2>
+                    Alternative Modules
+                </h2>
+
+                <p>
+                    Other technically eligible
+                    modules for consideration.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="alternative-grid">
+
+            {% for item
+                in view.explanation.alternatives %}
+
+            <article class="alternative-card">
+
+                <div class="alternative-header">
+
+                    <div>
+
+                        <span class="rank">
+                            #{{ item.rank }}
+                        </span>
+
+                        <h3>
+                            {{ item.module_id }}
+                        </h3>
+
+                    </div>
+
+                    <div class="mini-score">
+                        {{ item.match_percent }}%
+                    </div>
+
+                </div>
+
+                <div class="fit-label">
+                    {{ item.match_strength }}
+                    Match
+                </div>
+
+
+                {% if item.strengths %}
+
+                <h4>
+                    Matches
+                </h4>
+
+                <ul class="small-list">
+
+                    {% for reason
+                        in item.strengths %}
+
+                    <li>
+                        {{ reason }}
+                    </li>
+
+                    {% endfor %}
+
+                </ul>
+
+                {% endif %}
+
+
+                {% if item.tradeoffs %}
+
+                <h4>
+                    Trade-offs
+                </h4>
+
+                <ul class="tradeoff-list small-list">
+
+                    {% for tradeoff
+                        in item.tradeoffs %}
+
+                    <li>
+                        {{ tradeoff }}
+                    </li>
+
+                    {% endfor %}
+
+                </ul>
+
+                {% endif %}
+
+            </article>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+    {% endif %}
+
+
+    <section class="section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <h2>
+                    Requirement Comparison
+                </h2>
+
+                <p>
+                    Comparison against the
+                    customer's stated requirements.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="comparison-wrapper">
+
+            <table class="comparison-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Requirement
+                        </th>
+
+                        <th>
+                            Customer Need
+                        </th>
+
+                        {% for candidate
+                            in view.comparison.candidates %}
+
+                        <th>
+
+                            <div class="module-name">
+                                {{ candidate.module_id }}
+                            </div>
+
+                            <div class="
+                                candidate-label
+                                {% if
+                                    candidate.recommendation_label
+                                    == 'RECOMMENDED'
+                                %}
+                                    recommended-badge
+                                {% endif %}
+                            ">
+
+                                {{
+                                    candidate
+                                    .recommendation_label
+                                }}
+
+                            </div>
+
+                            <div class="candidate-score">
+                                {{ candidate.match_percent }}%
+                            </div>
+
+                        </th>
+
+                        {% endfor %}
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for row
+                        in view.comparison.rows %}
+
+                    <tr>
+
+                        <td class="requirement-name">
+                            {{ row.label }}
+                        </td>
+
+                        <td>
+
+                            <span class="
+                                requirement-level
+                                level-{{
+                                    row.requirement_level
+                                    | lower
+                                    | replace(' ', '-')
+                                }}
+                            ">
+
+                                {{
+                                    row.requirement_level
+                                }}
+
+                            </span>
+
+                        </td>
+
+
+                        {% for cell in row.cells %}
+
+                        <td>
+
+                            <div class="cell-value">
+                                {{ cell.value }}
+                            </div>
+
+                            <span class="
+                                status-badge
+                                status-{{
+                                    cell.status
+                                    | lower
+                                    | replace('_', '-')
+                                }}
+                            ">
+
+                                {{ cell.status }}
+
+                            </span>
+
+                        </td>
+
+                        {% endfor %}
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    {% else %}
+
+    <section class="no-match-card">
+
+        <div class="no-match-icon">
+            !
+        </div>
+
+        <h2>
+            No exact module match
+        </h2>
+
+        <p>
+            {{
+                view.explanation.summary
+            }}
+        </p>
+
+        <p class="no-match-guidance">
+            Review the mandatory requirements
+            with the customer or consult the
+            Unisem application engineering team.
+        </p>
+
+    </section>
+
+
+    {% if view.explanation.rejected %}
+
+    <section class="section">
+
+        <h2>
+            Modules reviewed
+        </h2>
+
+        {% for item
+            in view.explanation.rejected %}
+
+        <article class="rejected-card">
+
+            <div>
+
+                <h3>
+                    {{ item.module_id }}
+                </h3>
+
+                <span class="rejected-label">
+                    NOT ELIGIBLE
+                </span>
+
+            </div>
+
+            {% if item.blockers %}
+
+            <ul class="blocker-list">
+
+                {% for blocker
+                    in item.blockers %}
+
+                <li>
+                    {{ blocker }}
+                </li>
+
+                {% endfor %}
+
+            </ul>
+
+            {% endif %}
+
+        </article>
+
+        {% endfor %}
+
+    </section>
+
+    {% endif %}
+
+    {% endif %}
+
+
+    <footer class="action-bar">
+
+        <a
+            class="button button-secondary"
+            href="javascript:history.back()"
+        >
+            Back to Requirements
+        </a>
+
+        <a
+            class="button button-primary"
+            href="/"
+        >
+            Start New Customer
+        </a>
+
+    </footer>
+
+</div>
+
+</body>
+</html>

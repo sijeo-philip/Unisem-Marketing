@@ -2,7 +2,7 @@ import json
 import sys
 from pathlib import Path
 
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, redirect, url_for, session
 
 # ============================================================
 # Lesson 1 recommendation engine
@@ -13,11 +13,15 @@ try:
     from core.question_engine import (QuestionSession,QuestionTreeError)
     from core.selection_engine import (evaluate_portfolio)
     from core.recommendation_report import (summarize_requirement)
+    from core.recommendation_view import (build_recommendation_view)
+    from core.recommendation_bridge import (ModuleCandidate)
 except ImportError:
     # Compatibility with the earlier flat project layout.
     from question_engine import (QuestionSession,QuestionTreeError)
     from selection_engine import (evaluate_portfolio)
     from recommendation_report import (summarize_requirement)
+    from recommendation_view import (build_recommendation_view)
+    from recommendation_bridge import (ModuleCandidate)
 
 # ============================================================
 # Application paths
@@ -1314,6 +1318,39 @@ def validate_normalized_question_tree(tree):
     start_id = str(tree.get("start_question_id", ""))
     if (start_id not in ids):
         raise ValueError("Question-tree start question does not exist: "  + start_id)
+        
+        
+        
+def get_demo_recommendation_modules():
+
+    return [
+        ModuleCandidate(module_id="USE_8733",
+            wifi=True,
+            ble=True,
+            bluetooth_classic=True,
+            wifi6=False,
+            high_throughput=False,
+            host_interfaces=("usb",),
+        ),
+        ModuleCandidate(
+            module_id="USE_8851",
+            wifi=True,
+            ble=True,
+            bluetooth_classic=True,
+            wifi6=True,
+            high_throughput=False,
+            host_interfaces=("pcie_usb"),
+        ),
+
+        ModuleCandidate(module_id="USE_8852",
+            wifi=True,
+            ble=True,
+            bluetooth_classic=True,
+            wifi6=True,
+            high_throughput=True,
+            host_interfaces=("pcie_usb"),
+        ),
+    ]
 
 # ============================================================
 # Browser routes
@@ -1662,6 +1699,20 @@ def api_compare_modules():
                     ),
             }
         ), 500
+        
+        
+@app.route("/recommendation")
+def recommendation_page():
+    answers = session.get("recommendation_answers")
+    if not answers:
+        return redirect(url_for("index"))
+    modules = (get_demo_recommendation_modules())
+    view = build_recommendation_view(
+        answers,
+        modules,
+        max_alternatives=2,
+    )
+    return render_template("recommendation.html", view=view)
 # ============================================================
 # Application entry point
 # ============================================================
