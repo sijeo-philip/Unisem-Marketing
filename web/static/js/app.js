@@ -1297,13 +1297,13 @@ function renderRecommendation(
 ) {
 
     const view =
-        data.sales_view;
+        data.lesson3_view;
 
 
     if (!view) {
 
         showWizardError(
-            "Recommendation presentation data "
+            "Lesson 3 recommendation view "
             + "was not returned by the server."
         );
 
@@ -1335,7 +1335,7 @@ function renderRecommendation(
     renderTextListSection(
         "whySection",
         "whyList",
-        view.why_this_module
+        view.strengths
     );
 
 
@@ -1353,10 +1353,15 @@ function renderRecommendation(
     );
 
 
-    renderTextListSection(
+    const fitNotes = [
+		...(view.preference_matches || []),
+		...(view.tradeoffs || [])
+	];
+	
+	renderTextListSection(
         "preferenceSection",
         "preferenceList",
-        view.preference_notes
+        fitNotes
     );
 
 

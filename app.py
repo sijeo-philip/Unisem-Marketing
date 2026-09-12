@@ -13,14 +13,14 @@ try:
     from core.question_engine import (QuestionSession,QuestionTreeError)
     from core.selection_engine import (evaluate_portfolio)
     from core.recommendation_report import (summarize_requirement)
-    from core.recommendation_view import (build_recommendation_view)
+    from core.recommendation_view import (build_recommendation_view, build_browser_recommendation_view)
     from core.recommendation_bridge import (ModuleCandidate)
 except ImportError:
     # Compatibility with the earlier flat project layout.
     from question_engine import (QuestionSession,QuestionTreeError)
     from selection_engine import (evaluate_portfolio)
     from recommendation_report import (summarize_requirement)
-    from recommendation_view import (build_recommendation_view)
+    from recommendation_view import (build_recommendation_view, build_browser_recommendation_view)
     from recommendation_bridge import (ModuleCandidate)
 
 # ============================================================
@@ -1320,38 +1320,6 @@ def validate_normalized_question_tree(tree):
         raise ValueError("Question-tree start question does not exist: "  + start_id)
         
         
-        
-def get_demo_recommendation_modules():
-
-    return [
-        ModuleCandidate(module_id="USE_8733",
-            wifi=True,
-            ble=True,
-            bluetooth_classic=True,
-            wifi6=False,
-            high_throughput=False,
-            host_interfaces=("usb",),
-        ),
-        ModuleCandidate(
-            module_id="USE_8851",
-            wifi=True,
-            ble=True,
-            bluetooth_classic=True,
-            wifi6=True,
-            high_throughput=False,
-            host_interfaces=("pcie_usb"),
-        ),
-
-        ModuleCandidate(module_id="USE_8852",
-            wifi=True,
-            ble=True,
-            bluetooth_classic=True,
-            wifi6=True,
-            high_throughput=True,
-            host_interfaces=("pcie_usb"),
-        ),
-    ]
-
 # ============================================================
 # Browser routes
 # ============================================================
@@ -1541,10 +1509,12 @@ def api_wizard():
         if session.is_complete():
             requirement = (session.get_requirement())
             result = (build_recommendation_result(requirement))
+            lesson3_view = (build_browser_recommendation_view(result))
             return jsonify(
                 {
                     "status": "ok",
                     **result,
+                    "lesson3_view": lesson3_view,
                 }
             )
 
@@ -1701,18 +1671,6 @@ def api_compare_modules():
         ), 500
         
         
-@app.route("/recommendation")
-def recommendation_page():
-    answers = session.get("recommendation_answers")
-    if not answers:
-        return redirect(url_for("index"))
-    modules = (get_demo_recommendation_modules())
-    view = build_recommendation_view(
-        answers,
-        modules,
-        max_alternatives=2,
-    )
-    return render_template("recommendation.html", view=view)
 # ============================================================
 # Application entry point
 # ============================================================

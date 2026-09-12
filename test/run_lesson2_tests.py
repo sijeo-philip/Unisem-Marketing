@@ -13,7 +13,7 @@ PROJECT_ROOT = (
 
 TEST_DIR = (
     PROJECT_ROOT
-    / "tests"
+    / "test"
 )
 
 

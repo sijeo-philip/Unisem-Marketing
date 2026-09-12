@@ -23,4 +23,35 @@ def build_recommendation_view(answers, modules, max_alternatives=2):
     }
     
     
-    
+def build_browser_recommendation_view(recommendation_result):
+    """
+    Convert the authoritative Lesson 1/2 selection result
+    into a stable browser-facing Lesson 3 view.
+
+    IMPORTANT:
+    This function performs NO module selection,
+    NO scoring and NO engineering eligibility decisions.
+    """
+
+    if not isinstance(recommendation_result, dict):
+        raise ValueError("Recommendation result must be a dictionary")
+
+    sales_view = (recommendation_result.get("sales_view") or {})
+
+    top_candidate = (recommendation_result.get("top_candidate") or {})
+
+    decision = (recommendation_result.get("decision"))
+
+    return {
+        "decision": decision,
+        "has_recommendation": decision == "recommended",
+        "outcome": sales_view.get("outcome") or {},
+        "module": sales_view.get("module"),
+        "strengths": list(sales_view.get("why_this_module") or []),
+        "clarifications": list(sales_view.get("clarifications") or []),
+        "conflicts": list(sales_view.get("conflicts") or []),
+        "preference_matches": list(top_candidate.get("preference_matches") or []),
+        "tradeoffs": list(top_candidate.get("preference_tradeoffs") or []),
+        "next_action": sales_view.get("next_action") or "",
+        "alternatives": list(sales_view.get("alternatives") or []),
+    }
