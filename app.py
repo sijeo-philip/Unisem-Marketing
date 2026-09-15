@@ -54,7 +54,7 @@ MAX_WIZARD_ANSWERS = 64
 
 MAX_COMPARE_MODULES = 4
 
-APPLICATION_VERSION = "2.0-development"
+APPLICATION_VERSION = "3.0-development"
 
 # ============================================================
 # Flask application
@@ -293,9 +293,7 @@ def validate_answer_list(answers):
     if len(answers) > MAX_WIZARD_ANSWERS:
         raise ValueError("Too many questionnaire answers were supplied")
         
-def validate_module_records(
-    modules,
-):
+def validate_module_records(modules):
     """
     Verify basic module-database integrity.
 
@@ -311,6 +309,12 @@ def validate_module_records(
     for index, module in enumerate(modules):
         if not isinstance(module,dict):
             raise ValueError("Invalid module record at index " + str(index))
+        for required_field in ("id", "name", "family"):
+            value = module.get(required_field)
+            if value is None:
+                raise ValueError("Module record at index "+ str(index)+ " is missing required field: "+ required_field)
+            if (isinstance(value, str) and not value.strip()):
+                raise ValueError("Module record at index " + str(index) + " contains an empty " + required_field)
         module_id = (get_module_identifier(module))
         if module_id is None:
             raise ValueError("Module record at index " + str(index) + " has no module identifier")
@@ -1355,7 +1359,7 @@ def api_health():
             "application": "Unisem Offline Marketing Tool",
             "application_version":APPLICATION_VERSION,
             "offline": True,
-            "lesson": "2G",
+            "lesson": "3G",
             "modules_database": modules_file is not None,
             "question_tree": question_tree_file is not None,
         }

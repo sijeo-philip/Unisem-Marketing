@@ -686,6 +686,10 @@ async function requestWizardState() {
             data.state ===
             "complete"
         ) {
+			if (!isValidCompletionPayload(data))
+			{
+				throw new Error("The completed recommendation response is incomplete");
+			}
 
             completeWizard(
                 data
@@ -1171,6 +1175,57 @@ async function submitAnswer(
 /* ========================================================
    COMPLETION
    ======================================================== */
+   
+function isValidCompletionPayload(
+    data
+) {
+
+    if (
+        !data
+        ||
+        typeof data !== "object"
+    ) {
+
+        return false;
+    }
+
+
+    if (
+        data.state !==
+        "complete"
+    ) {
+
+        return false;
+    }
+
+
+    if (
+        !data.lesson3_view
+        ||
+        typeof data.lesson3_view
+        !== "object"
+        ||
+        Array.isArray(
+            data.lesson3_view
+        )
+    ) {
+
+        return false;
+    }
+
+
+    if (
+        !Array.isArray(
+            data.ranked_results
+        )
+    ) {
+
+        return false;
+    }
+
+
+    return true;
+}
 
 function completeWizard(
     data
@@ -1486,7 +1541,11 @@ function configureComparison(
 
         const result =
             results[index];
-
+			
+		if( result || typeof result !== "object" )
+		{
+			continue;
+		}
 
         const moduleId =
             getResultModuleId(
@@ -1520,6 +1579,17 @@ function configureComparison(
 function getResultModuleId(
     result
 ) {
+
+    if (
+        !result
+        ||
+        typeof result !==
+        "object"
+    ) {
+
+        return null;
+    }
+
 
     return (
         result.module_id
@@ -2207,6 +2277,12 @@ function buildComparisonChoice(
 function renderOutcome(
     outcome
 ) {
+	
+	if( !outcome || typeof outcome != "object")
+	{
+		outcome = {};
+	}
+	
 
     const badge =
         document.getElementById(
@@ -2468,9 +2544,34 @@ function renderTextListSection(
     }
 
 
+        const cleanItems =
+        items.filter(
+            item =>
+                item !== null
+                &&
+                item !== undefined
+                &&
+                String(
+                    item
+                ).trim() !== ""
+        );
+
+
+    if (
+        cleanItems.length === 0
+    ) {
+
+        section.classList.add(
+            "hidden"
+        );
+
+        return;
+    }
+
+
     for (
         const item
-        of items
+        of cleanItems
     ) {
 
         const li =
@@ -2478,12 +2579,10 @@ function renderTextListSection(
                 "li"
             );
 
-
         li.textContent =
             String(
                 item
             );
-
 
         list.appendChild(
             li
