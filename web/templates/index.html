@@ -1,638 +1,253 @@
 <!DOCTYPE html>
+
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Unisem Module Selector</title>
-
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Unisem Module Selector</title>
+<link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet"/>
 </head>
-
-
 <body>
-
-    <header class="top-header">
-
-        <div class="brand">
-            <div class="brand-name">
+<header class="top-header">
+<div class="brand">
+<div class="brand-name">
                 UNISEM
             </div>
-
-            <div class="brand-subtitle">
+<div class="brand-subtitle">
                 Module Marketing Tools
             </div>
-        </div>
-
-        <div class="offline-badge">
+</div>
+<div class="offline-badge">
             OFFLINE
         </div>
-
-    </header>
-
-
-    <main class="main-container">
-
-        <section class="hero">
-
-            <p class="eyebrow">
-                SALES & MARKETING ASSISTANT
+</header>
+<main class="main-container">
+<section class="hero">
+<p class="eyebrow">
+                SALES &amp; MARKETING ASSISTANT
             </p>
-
-            <h1>
+<h1>
                 Find the right Unisem wireless module
             </h1>
-
-            <p class="hero-text">
+<p class="hero-text">
                 Answer a few customer requirement questions
                 and the tool will guide you toward the most
                 suitable Unisem module.
             </p>
-
-            <button
-                id="startWizardButton"
-                class="primary-button"
-                type="button"
-            >
+<button class="primary-button" id="startWizardButton" type="button">
                 Start Sales Wizard
             </button>
-
-        </section>
-
-
-        <section class="status-panel">
-
-            <h2>
+</section>
+<section class="status-panel">
+<h2>
                 Application Status
             </h2>
-
-
-            <div class="status-grid">
-
-                <div class="status-card">
-
-                    <span class="status-label">
+<div class="status-grid">
+<div class="status-card">
+<span class="status-label">
                         Application
                     </span>
-
-                    <span
-                        id="backendStatus"
-                        class="status-value pending"
-                    >
+<span class="status-value pending" id="backendStatus">
                         Checking...
                     </span>
-
-                </div>
-
-
-                <div class="status-card">
-
-                    <span class="status-label">
+</div>
+<div class="status-card">
+<span class="status-label">
                         Module Portfolio
                     </span>
-
-                    <span
-                        id="moduleStatus"
-                        class="status-value pending"
-                    >
+<span class="status-value pending" id="moduleStatus">
                         Checking...
                     </span>
-
-                </div>
-
-
-                <div class="status-card">
-
-                    <span class="status-label">
+</div>
+<div class="status-card">
+<span class="status-label">
                         Sales Question Tree
                     </span>
-
-                    <span
-                        id="questionTreeStatus"
-                        class="status-value pending"
-                    >
+<span class="status-value pending" id="questionTreeStatus">
                         Checking...
                     </span>
-
-                </div>
-
-
-                <div class="status-card">
-
-                    <span class="status-label">
+</div>
+<div class="status-card">
+<span class="status-label">
                         Operating Mode
                     </span>
-
-                    <span
-                        id="offlineStatus"
-                        class="status-value"
-                    >
+<span class="status-value" id="offlineStatus">
                         Local / Offline
                     </span>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <section
-    id="wizardPanel"
-    class="wizard-panel hidden"
->
-
-    <div class="wizard-header">
-
-        <div>
-
-            <p class="eyebrow">
+</div>
+</div>
+</section>
+<section class="wizard-panel hidden" id="wizardPanel">
+<div class="wizard-header">
+<div>
+<p class="eyebrow">
                 CUSTOMER REQUIREMENTS
             </p>
-
-            <h2>
+<h2>
                 Sales Wizard
             </h2>
-
-        </div>
-
-
-        <div
-            id="progressText"
-            class="progress-text"
-        >
-        </div>
-		
-		<div
-		id="sessionStatus"
-		class="session-status"
-		>
+</div>
+<div class="progress-text" id="progressText">
+</div>
+<div class="session-status" id="sessionStatus">
     0 answers captured
 	</div>
-
-    </div>
-
-
-    <div
-        id="wizardError"
-        class="wizard-error hidden"
-    >
-    </div>
-
-
-    <div
-        id="questionArea"
-    >
-
-        <p
-            id="questionId"
-            class="question-id"
-        >
-        </p>
-
-        <h3
-            id="questionText"
-            class="question-text"
-        >
-        </h3>
-
-
-        <div
-            id="optionsContainer"
-            class="options-container"
-        >
-        </div>
-		
-		<div
-			id="questionActions"
-			class="question-actions hidden"
-		>
-		</div>
-		
-		<div
-    id="wizardNavigation"
-    class="wizard-navigation"
->
-
-    <button
-        id="backButton"
-        class="secondary-button"
-        type="button"
-        disabled
-    >
+</div>
+<div class="wizard-error hidden" id="wizardError">
+</div>
+<div id="questionArea">
+<p class="question-id" id="questionId">
+</p>
+<h3 class="question-text" id="questionText">
+</h3>
+<div class="options-container" id="optionsContainer">
+</div>
+<div class="question-actions hidden" id="questionActions">
+</div>
+<div class="wizard-navigation" id="wizardNavigation">
+<button class="secondary-button" disabled="" id="backButton" type="button">
         ← Back
     </button>
-
-
-    <button
-        id="restartButton"
-        class="text-button"
-        type="button"
-    >
+<button class="text-button" id="restartButton" type="button">
         Restart Wizard
     </button>
-
 </div>
-
-    </div>
-
-
-    <div
-    id="wizardComplete"
-    class="wizard-complete hidden"
->
-
-    <div class="complete-icon">
+</div>
+<div class="wizard-complete hidden" id="wizardComplete">
+<div class="complete-icon">
         ✓
     </div>
-
-
-    <h3 id="completionTitle">
+<h3 id="completionTitle">
         Requirement evaluation complete
     </h3>
-
-
-    <p id="completionMessage">
+<p id="completionMessage">
         The Unisem recommendation engine has
         evaluated the customer requirements.
     </p>
-
-
-    <div
-        id="answerSummary"
-        class="answer-summary"
-    >
-    </div>
-
-
-    <div
-    id="recommendationPanel"
-    class="recommendation-panel hidden"
->
-
-    <div class="result-top-row">
-
-        <div>
-
-            <p
-                id="moduleRole"
-                class="result-eyebrow"
-            >
-            </p>
-
-            <div
-                id="decisionBadge"
-                class="decision-badge"
-            >
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <h3
-        id="recommendedModule"
-        class="recommended-module"
-    >
-    </h3>
-
-
-    <p
-        id="recommendedModuleName"
-        class="recommended-module-name"
-    >
-    </p>
-
-
-    <p
-        id="moduleDescription"
-        class="module-description hidden"
-    >
-    </p>
-
-
-    <h4
-        id="resultHeadline"
-        class="result-headline"
-    >
-    </h4>
-
-
-    <p
-        id="resultSummary"
-        class="result-summary"
-    >
-    </p>
-
-
-    <div
-        id="capabilityChips"
-        class="capability-chips"
-    >
-    </div>
-
-
-    <section
-        id="chooseWhenSection"
-        class="result-section hidden"
-    >
-
-        <h4>
+<div class="answer-summary" id="answerSummary">
+</div>
+<div class="recommendation-panel hidden" id="recommendationPanel">
+<div class="result-top-row">
+<div>
+<p class="result-eyebrow" id="moduleRole">
+</p><div class="decision-badge" id="decisionBadge"></div>
+</div>
+</div>
+<h3 class="recommended-module" id="recommendedModule"></h3><p class="recommended-module-name" id="recommendedModuleName"></p><p class="module-description hidden" id="moduleDescription">
+</p>
+<h4 class="result-headline" id="resultHeadline">
+</h4>
+<p class="result-summary" id="resultSummary">
+</p>
+<div class="capability-chips" id="capabilityChips">
+</div>
+<section class="result-section hidden" id="chooseWhenSection">
+<h4>
             When to position this module
         </h4>
-
-        <p id="chooseWhen">
-        </p>
-
-    </section>
-
-
-    <section
-        id="whySection"
-        class="result-section hidden"
-    >
-
-        <h4>
+<p id="chooseWhen"></p></section>
+<section class="result-section hidden" id="whySection">
+<h4>
             Why this module?
         </h4>
-
-        <ul
-            id="whyList"
-            class="result-list positive-list"
-        >
-        </ul>
-
-    </section>
-
-
-    <section
-        id="clarificationSection"
-        class="result-section attention-section hidden"
-    >
-
-        <h4>
+<ul class="result-list positive-list" id="whyList">
+</ul>
+</section>
+<section class="result-section attention-section hidden" id="clarificationSection">
+<h4>
             Clarifications to confirm
         </h4>
-
-        <ul
-            id="clarificationList"
-            class="result-list"
-        >
-        </ul>
-
-    </section>
-
-
-    <section
-        id="conflictSection"
-        class="result-section conflict-section hidden"
-    >
-
-        <h4>
+<ul class="result-list" id="clarificationList">
+</ul>
+</section>
+<section class="result-section conflict-section hidden" id="conflictSection">
+<h4>
             Requirement conflicts
         </h4>
-
-        <ul
-            id="conflictList"
-            class="result-list"
-        >
-        </ul>
-
-    </section>
-
-
-    <section
-        id="preferenceSection"
-        class="result-section hidden"
-    >
-
-        <h4>
+<ul class="result-list" id="conflictList">
+</ul>
+</section>
+<section class="result-section hidden" id="preferenceSection">
+<h4>
             Fit notes and trade-offs
         </h4>
-
-        <ul
-            id="preferenceList"
-            class="result-list"
-        >
-        </ul>
-
-    </section>
-
-
-    <section class="next-action-card">
-
-        <span class="next-action-label">
+<ul class="result-list" id="preferenceList">
+</ul>
+</section>
+<section class="next-action-card">
+<span class="next-action-label">
             Recommended next action
         </span>
-
-        <p id="nextAction">
-        </p>
-
-    </section>
-
-
-    <section
-        id="alternativesSection"
-        class="result-section hidden"
-    >
-
-        <h4>
+<p id="nextAction">
+</p>
+</section>
+<section class="result-section hidden" id="alternativesSection">
+<h4>
             Other evaluated modules
         </h4>
-
-        <div
-            id="alternativesContainer"
-            class="alternatives-container"
-        >
-        </div>
-
-    </section>
-
+<div class="alternatives-container" id="alternativesContainer">
 </div>
-
-<section
-    id="comparisonLauncher"
-    class="comparison-launcher hidden"
->
-
-    <div class="comparison-launcher-header">
-
-        <div>
-
-            <p class="result-eyebrow">
+</section>
+</div>
+<section class="comparison-launcher hidden" id="comparisonLauncher">
+<div class="comparison-launcher-header">
+<div>
+<p class="result-eyebrow">
                 MODULE EVALUATION
             </p>
-
-            <h3 id="comparisonLauncherTitle">
+<h3 id="comparisonLauncherTitle">
                 Compare Modules
             </h3>
-
-            <p id="comparisonLauncherText">
+<p id="comparisonLauncherText">
                 Select up to four evaluated modules
                 for a side-by-side comparison.
             </p>
-
-        </div>
-
-    </div>
-
-
-    <div
-        id="comparisonChoices"
-        class="comparison-choices"
-    >
-    </div>
-
-
-    <div class="comparison-actions">
-
-        <button
-            id="compareModulesButton"
-            class="primary-button"
-            type="button"
-        >
+</div>
+</div>
+<div class="comparison-choices" id="comparisonChoices">
+</div>
+<div class="comparison-actions">
+<button class="primary-button" id="compareModulesButton" type="button">
             Compare Selected Modules
         </button>
-
-    </div>
-
+</div>
 </section>
-
-
-<section
-    id="comparisonPanel"
-    class="comparison-panel hidden"
->
-
-    <div class="comparison-panel-header">
-
-        <div>
-
-            <p class="result-eyebrow">
+<section class="comparison-panel hidden" id="comparisonPanel">
+<div class="comparison-panel-header">
+<div>
+<p class="result-eyebrow">
                 MODULE COMPARISON
             </p>
-
-            <h3>
+<h3>
                 Side-by-side evaluation
             </h3>
-
-        </div>
-
-    </div>
-
-
-    <div
-        id="comparisonError"
-        class="wizard-error hidden"
-    >
-    </div>
-
-
-    <div
-        id="comparisonTableWrapper"
-        class="comparison-table-wrapper"
-    >
-
-        <table
-            id="comparisonTable"
-            class="comparison-table"
-        >
-        </table>
-
-    </div>
-	
-	
-	<div
-    id="completionActions"
-    class="completion-actions"
->
-
-    <button
-        id="changeAnswersButton"
-        class="secondary-button"
-        type="button"
-    >
+</div>
+</div>
+<div class="wizard-error hidden" id="comparisonError">
+</div>
+<div class="comparison-table-wrapper" id="comparisonTableWrapper">
+<table class="comparison-table" id="comparisonTable">
+</table>
+</div>
+</section>
+<div class="completion-actions" id="completionActions">
+<button class="secondary-button" id="changeAnswersButton" type="button">
         ← Change Last Answer
     </button>
-
-
-    <button
-        id="newCustomerButton"
-        class="primary-button"
-        type="button"
-    >
+<button class="primary-button" id="newCustomerButton" type="button">
         Start New Customer
     </button>
-
 </div>
-
-</section>
-
-        <div
-            id="decisionBadge"
-            class="decision-badge"
-        >
-        </div>
-
-
-        <h3
-            id="recommendedModule"
-            class="recommended-module"
-        >
-        </h3>
-
-
-        <p
-            id="recommendedModuleName"
-            class="recommended-module-name"
-        >
-        </p>
-
-
-        <p
-            id="chooseWhen"
-            class="choose-when"
-        >
-        </p>
-
-
-        <div
-            id="recommendationDetails"
-            class="recommendation-details"
-        >
-        </div>
-		
-		
-
-    </div>
-
 </div>
-
+<!-- END wizardComplete -->
 </section>
-
-    </main>
-
-
-    <footer>
+<!-- END wizardPanel -->
+</main>
+<footer>
 
         Unisem Module Marketing Tools
 
     </footer>
-
-
-    <script
-        src="{{ url_for('static', filename='js/app.js') }}"
-    ></script>
-
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
-
 </html>

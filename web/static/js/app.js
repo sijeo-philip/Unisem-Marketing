@@ -1542,7 +1542,7 @@ function configureComparison(
         const result =
             results[index];
 			
-		if( result || typeof result !== "object" )
+		if( !result || typeof result !== "object" )
 		{
 			continue;
 		}
