@@ -40,7 +40,11 @@ const emailDraftState = {
 	generated: false
 };
 
-
+const documentSelectionState = {
+	moduleId: "",
+	documents: [],
+	selectedIds: []
+};
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -310,6 +314,25 @@ document
     .addEventListener(
         "input",
         syncEmailDraftState
+    );
+	
+	document
+    .getElementById(
+        "selectRecommendedDocumentsButton"
+    )
+    .addEventListener(
+        "click",
+        selectRecommendedDocuments
+    );
+
+
+document
+    .getElementById(
+        "clearDocumentSelectionButton"
+    )
+    .addEventListener(
+        "click",
+        clearDocumentSelection
     );
 }
 
@@ -655,6 +678,8 @@ function saveCustomerDetails() {
     );
 	
 	generateFollowUpEmail();
+	
+	loadDocumentsForRecommendation();
 }
 
 
@@ -818,6 +843,8 @@ async function startNewCustomer() {
 
 
     clearEmailComposer();
+	
+	clearDocumentLibrary();
 
 
     await restartWizard();
@@ -1656,6 +1683,7 @@ function completeWizard(
 	if(customerState.email)
 	{
 		generateFollowUpEmail();
+		loadDocumentsForRecommendation();
 	}
 }
 
@@ -4127,3 +4155,587 @@ function clearEmailComposer() {
 
     hideEmailDraftMessages();
 }
+
+function getRecommendedModuleId() {
+
+    if (
+        !wizardState.completeResult
+        ||
+        !wizardState.completeResult.lesson3_view
+    ) {
+
+        return "";
+    }
+
+
+    const module =
+        wizardState
+            .completeResult
+            .lesson3_view
+            .module;
+
+
+    if (
+        !module
+        ||
+        typeof module !== "object"
+    ) {
+
+        return "";
+    }
+
+
+    return String(
+        module.module_id || ""
+    ).trim();
+}
+
+async function loadDocumentsForRecommendation() {
+
+    hideDocumentLibraryError();
+
+
+    const moduleId =
+        getRecommendedModuleId();
+
+
+    if (!moduleId) {
+
+        clearDocumentLibrary();
+
+        return;
+    }
+
+
+    const previousModuleId =
+        documentSelectionState.moduleId;
+
+
+    const moduleChanged =
+        (
+            previousModuleId
+            &&
+            previousModuleId !== moduleId
+        );
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/documents/"
+                + encodeURIComponent(
+                    moduleId
+                )
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Unable to load module documents."
+            );
+        }
+
+
+        const data =
+            await response.json();
+
+
+        const documents =
+            Array.isArray(
+                data.documents
+            )
+            ? data.documents
+            : [];
+
+
+        documentSelectionState.moduleId =
+            moduleId;
+
+
+        documentSelectionState.documents =
+            documents;
+
+
+        if (
+            moduleChanged
+            ||
+            documentSelectionState
+                .selectedIds
+                .length === 0
+        ) {
+
+            documentSelectionState.selectedIds =
+                documents
+                    .filter(
+                        document =>
+                            document.available
+                            &&
+                            document
+                                .default_selected
+                    )
+                    .map(
+                        document =>
+                            document.id
+                    );
+        }
+
+
+        renderDocumentLibrary();
+
+
+        document
+            .getElementById(
+                "documentLibraryPanel"
+            )
+            .classList
+            .remove(
+                "hidden"
+            );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Document library error:",
+            error
+        );
+
+
+        showDocumentLibraryError(
+            "Unable to load the technical "
+            + "document library."
+        );
+    }
+}
+
+function renderDocumentLibrary() {
+
+    const list =
+        document.getElementById(
+            "documentLibraryList"
+        );
+
+
+    const empty =
+        document.getElementById(
+            "documentLibraryEmpty"
+        );
+
+
+    list.innerHTML =
+        "";
+
+
+    const documents =
+        documentSelectionState.documents;
+
+
+    if (
+        documents.length === 0
+    ) {
+
+        empty.classList.remove(
+            "hidden"
+        );
+
+
+        updateSelectedDocumentCount();
+
+        return;
+    }
+
+
+    empty.classList.add(
+        "hidden"
+    );
+
+
+    for (
+        const documentInfo
+        of documents
+    ) {
+
+        const row =
+            buildDocumentRow(
+                documentInfo
+            );
+
+
+        list.appendChild(
+            row
+        );
+    }
+
+
+    updateSelectedDocumentCount();
+}
+
+function buildDocumentRow(
+    documentInfo
+) {
+
+    const row =
+        document.createElement(
+            "div"
+        );
+
+
+    row.className =
+        "document-library-item";
+
+
+    if (
+        !documentInfo.available
+    ) {
+
+        row.classList.add(
+            "document-library-item-missing"
+        );
+    }
+
+
+    const selectionArea =
+        document.createElement(
+            "label"
+        );
+
+
+    selectionArea.className =
+        "document-selection-area";
+
+
+    const checkbox =
+        document.createElement(
+            "input"
+        );
+
+
+    checkbox.type =
+        "checkbox";
+
+
+    checkbox.value =
+        documentInfo.id;
+
+
+    checkbox.disabled =
+        !documentInfo.available;
+
+
+    checkbox.checked =
+        documentSelectionState
+            .selectedIds
+            .includes(
+                documentInfo.id
+            );
+
+
+    checkbox.addEventListener(
+        "change",
+        () =>
+            toggleDocumentSelection(
+                documentInfo.id,
+                checkbox.checked
+            )
+    );
+
+
+    const textArea =
+        document.createElement(
+            "div"
+        );
+
+
+    textArea.className =
+        "document-info";
+
+
+    const title =
+        document.createElement(
+            "div"
+        );
+
+
+    title.className =
+        "document-title";
+
+
+    title.textContent =
+        documentInfo.title;
+
+
+    const metadata =
+        document.createElement(
+            "div"
+        );
+
+
+    metadata.className =
+        "document-metadata";
+
+
+    metadata.textContent =
+        (
+            documentInfo.type
+            + " • "
+            + documentInfo.filename
+        );
+
+
+    textArea.appendChild(
+        title
+    );
+
+
+    textArea.appendChild(
+        metadata
+    );
+
+
+    selectionArea.appendChild(
+        checkbox
+    );
+
+
+    selectionArea.appendChild(
+        textArea
+    );
+
+
+    row.appendChild(
+        selectionArea
+    );
+
+
+    if (
+        documentInfo.available
+        &&
+        documentInfo.preview_url
+    ) {
+
+        const preview =
+            document.createElement(
+                "a"
+            );
+
+
+        preview.className =
+            "document-preview-button";
+
+
+        preview.href =
+            documentInfo.preview_url;
+
+
+        preview.target =
+            "_blank";
+
+
+        preview.rel =
+            "noopener";
+
+
+        preview.textContent =
+            "Preview";
+
+
+        row.appendChild(
+            preview
+        );
+
+    } else {
+
+        const missing =
+            document.createElement(
+                "span"
+            );
+
+
+        missing.className =
+            "document-missing-label";
+
+
+        missing.textContent =
+            "File not installed";
+
+
+        row.appendChild(
+            missing
+        );
+    }
+
+
+    return row;
+}
+
+function toggleDocumentSelection(
+    documentId,
+    selected
+) {
+
+    const selectedIds =
+        new Set(
+            documentSelectionState
+                .selectedIds
+        );
+
+
+    if (selected) {
+
+        selectedIds.add(
+            documentId
+        );
+
+    } else {
+
+        selectedIds.delete(
+            documentId
+        );
+    }
+
+
+    documentSelectionState.selectedIds =
+        Array.from(
+            selectedIds
+        );
+
+
+    updateSelectedDocumentCount();
+
+
+    console.log(
+        "Selected documents:",
+        documentSelectionState
+            .selectedIds
+    );
+}
+
+function selectRecommendedDocuments() {
+
+    documentSelectionState.selectedIds =
+        documentSelectionState
+            .documents
+            .filter(
+                documentInfo =>
+                    documentInfo.available
+                    &&
+                    documentInfo
+                        .default_selected
+            )
+            .map(
+                documentInfo =>
+                    documentInfo.id
+            );
+
+
+    renderDocumentLibrary();
+}
+
+function clearDocumentSelection() {
+
+    documentSelectionState.selectedIds =
+        [];
+
+
+    renderDocumentLibrary();
+}
+
+function updateSelectedDocumentCount() {
+
+    document
+        .getElementById(
+            "selectedDocumentCount"
+        )
+        .textContent =
+            String(
+                documentSelectionState
+                    .selectedIds
+                    .length
+            );
+}
+
+function showDocumentLibraryError(
+    message
+) {
+
+    const element =
+        document.getElementById(
+            "documentLibraryError"
+        );
+
+
+    element.textContent =
+        message;
+
+
+    element.classList.remove(
+        "hidden"
+    );
+}
+
+
+function hideDocumentLibraryError() {
+
+    const element =
+        document.getElementById(
+            "documentLibraryError"
+        );
+
+
+    element.textContent =
+        "";
+
+
+    element.classList.add(
+        "hidden"
+    );
+}
+
+function resetDocumentSelectionState() {
+
+    documentSelectionState.moduleId =
+        "";
+
+
+    documentSelectionState.documents =
+        [];
+
+
+    documentSelectionState.selectedIds =
+        [];
+}
+
+function clearDocumentLibrary() {
+
+    resetDocumentSelectionState();
+
+
+    const list =
+        document.getElementById(
+            "documentLibraryList"
+        );
+
+
+    list.innerHTML =
+        "";
+
+
+    document
+        .getElementById(
+            "documentLibraryPanel"
+        )
+        .classList
+        .add(
+            "hidden"
+        );
+
+
+    updateSelectedDocumentCount();
+
+
+    hideDocumentLibraryError();
+}
+

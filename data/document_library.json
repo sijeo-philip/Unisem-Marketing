@@ -1,0 +1,35 @@
+{
+    "version": "2026-09",
+    "documents": [
+        {
+            "id": "USE_8852_DATASHEET",
+            "module_id": "USE_8852",
+            "type": "Datasheet",
+            "title": "USE_8852 Datasheet",
+            "filename": "USE_8852_Datasheet.pdf",
+            "relative_path": "USE_8852_Datasheet.pdf",
+            "customer_shareable": true,
+            "default_selected": true
+        },
+        {
+            "id": "USE_8852_PRODUCT_BRIEF",
+            "module_id": "USE_8852",
+            "type": "Product Brief",
+            "title": "USE_8852 Product Brief",
+            "filename": "USE_8852_Product_Brief.pdf",
+            "relative_path": "USE_8852_Product_Brief.pdf",
+            "customer_shareable": true,
+            "default_selected": true
+        },
+        {
+            "id": "USE_8852_APPLICATION_NOTE",
+            "module_id": "USE_8852",
+            "type": "Application Note",
+            "title": "USE_8852 Application Note",
+            "filename": "USE_8852_Application_Note.pdf",
+            "relative_path": "USE_8852_Application_Note.pdf",
+            "customer_shareable": true,
+            "default_selected": false
+        }
+    ]
+}

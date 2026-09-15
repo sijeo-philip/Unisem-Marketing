@@ -1628,3 +1628,165 @@ footer {
         width: 100%;
     }
 }
+
+
+/* ========================================================
+   LESSON 4C
+   DOCUMENT LIBRARY
+   ======================================================== */
+
+.document-library-panel {
+    margin-top: 32px;
+    padding: 24px;
+    border: 1px solid #d9dee7;
+    border-radius: 14px;
+    background: #ffffff;
+}
+
+
+.document-library-header {
+    margin-bottom: 20px;
+}
+
+
+.document-library-header h3 {
+    margin-top: 4px;
+    margin-bottom: 8px;
+}
+
+
+.document-library-description {
+    margin: 0;
+    color: #5f6877;
+    line-height: 1.5;
+}
+
+
+.document-library-toolbar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+
+.document-library-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+
+.document-library-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+
+    padding: 14px 16px;
+
+    border: 1px solid #d9dee7;
+    border-radius: 10px;
+
+    background: #ffffff;
+}
+
+
+.document-library-item-missing {
+    opacity: 0.65;
+    background: #f7f7f8;
+}
+
+
+.document-selection-area {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    flex: 1;
+
+    cursor: pointer;
+}
+
+
+.document-selection-area input {
+    margin-top: 4px;
+}
+
+
+.document-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+
+.document-title {
+    font-weight: 600;
+}
+
+
+.document-metadata {
+    font-size: 13px;
+    color: #6a7280;
+}
+
+
+.document-preview-button {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 8px 13px;
+
+    border: 1px solid #cfd5df;
+    border-radius: 8px;
+
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+
+.document-library-empty {
+    padding: 18px;
+
+    border: 1px dashed #cfd5df;
+    border-radius: 10px;
+
+    color: #6a7280;
+}
+
+
+.document-missing-label {
+    font-size: 13px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+.document-selection-summary {
+    margin-top: 18px;
+
+    padding-top: 16px;
+
+    border-top: 1px solid #e1e5eb;
+}
+
+
+@media (
+    max-width: 700px
+) {
+
+    .document-library-item {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+
+    .document-preview-button {
+        margin-left: 30px;
+    }
+}
+

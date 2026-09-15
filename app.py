@@ -1,8 +1,10 @@
 import json
 import sys
+import os
 from pathlib import Path
 
-from flask import Flask, jsonify, render_template, request, redirect, url_for, session
+from flask import Flask, jsonify, render_template, request, redirect, url_for, session, abort, send_file
+
 
 # ============================================================
 # Lesson 1 recommendation engine
@@ -46,6 +48,10 @@ def get_base_dir() -> Path:
 
 BASE_DIR = get_base_dir()
 
+DOCUMENT_ROOT = (BASE_DIR / "library")
+
+DOCUMENT_LIBRARY_FILE = ( BASE_DIR / "data" / "document_library.json" )
+
 # ============================================================
 # Application safety limits
 # ============================================================
@@ -65,6 +71,41 @@ app = Flask(
     template_folder=str(BASE_DIR / "web" / "templates"),
     static_folder=str(BASE_DIR / "web" / "static"),
 )
+
+def load_document_library():
+
+    if not DOCUMENT_LIBRARY_FILE.exists():
+        return {"version": "",
+            "documents": []
+        }
+
+    with open(DOCUMENT_LIBRARY_FILE, "r", encoding="utf-8") as file:
+        data = json.load(file)
+    if not isinstance(data.get("documents"), list):
+        data["documents"] = []
+    return data
+
+
+def resolve_document_path(relative_path):
+    if not relative_path:
+        return None
+    root = DOCUMENT_ROOT.resolve()
+    candidate = (DOCUMENT_ROOT / relative_path).resolve()
+    try:
+        common_path = os.path.commonpath([str(root), str(candidate)])
+    except ValueError:
+        return None
+    if common_path != str(root):
+        return None
+    return candidate
+
+def find_document_by_id(document_id):
+    library = (load_document_library())
+    for document in library["documents"]:
+        if (document.get("id") == document_id):
+            return document
+    return None
+
 
 
 @app.after_request
@@ -1674,7 +1715,56 @@ def api_compare_modules():
             }
         ), 500
         
-        
+
+
+@app.get("/api/documents/<module_id>")
+def api_module_documents(module_id):
+    library = (load_document_library())
+    results = []
+    for document in library["documents"]:
+        if not document.get("customer_shareable", False):
+            continue
+        document_module_id = (str(document.get("module_id", "")).strip())
+        if (document_module_id not in (module_id, "*")):
+            continue
+        path = resolve_document_path(document.get("relative_path"))
+        file_exists = (path is not None and path.is_file())
+        document_id = (document.get("id"))
+        results.append(
+            {
+                "id": document_id,
+                "module_id": document_module_id,
+                "type": document.get("type", "Document"),
+                "title": document.get("title", document.get("filename", "Document")),
+                "filename": document.get("filename", "" ),
+                "default_selected": bool(document.get("default_selected", False)),
+                "available": file_exists,
+                "preview_url": ( url_for("serve_document_file", document_id=document_id) if file_exists else None)
+            }
+        )
+
+    return jsonify(
+        {
+            "module_id": module_id,
+            "library_version": library.get("version", ""),
+            "documents": results
+        }
+    )   
+
+
+@app.get("/api/document-file/<document_id>")
+def serve_document_file(document_id):
+    document = find_document_by_id(document_id)
+    if document is None:
+        abort(404)
+
+    if not document.get("customer_shareable", False):
+        abort(403)
+    path = resolve_document_path(document.get("relative_path"))
+
+    if (path is None or not path.is_file()):
+        abort(404)
+    return send_file(path, as_attachment=False, download_name= document.get("filename", path.name))    
 # ============================================================
 # Application entry point
 # ============================================================
