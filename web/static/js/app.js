@@ -17,6 +17,31 @@ const wizardState = {
 };
 
 
+
+/*==============================================================
+LESSON 4A
+CUSTOMER SESSION
+===============================================================*/
+
+const customerState = {
+	name: "",
+	company: "",
+	email: "",
+	phone: "",
+	project: "",
+	notes: ""
+	
+};
+
+const emailDraftState = {
+	recipient: "",
+	subject: "",
+	body: "",
+	generated: false
+};
+
+
+
 document.addEventListener(
     "DOMContentLoaded",
     initializeApplication
@@ -200,6 +225,14 @@ function configureButtons() {
             startWizard
         );
 
+	document
+		.getElementById(
+			"saveCustomerDetailsButton"
+		)
+		.addEventListener(
+			"click",
+			saveCustomerDetails
+		);
 
     document
         .getElementById(
@@ -231,14 +264,53 @@ function configureButtons() {
         );
 
 
-    document
-        .getElementById(
-            "newCustomerButton"
-        )
-        .addEventListener(
-            "click",
-            restartWizard
-        );
+   document
+    .getElementById(
+        "newCustomerButton"
+    )
+    .addEventListener(
+        "click",
+        startNewCustomer
+    );
+	
+	document
+    .getElementById(
+        "regenerateEmailButton"
+    )
+    .addEventListener(
+        "click",
+        generateFollowUpEmail
+    );
+
+
+document
+    .getElementById(
+        "copyEmailButton"
+    )
+    .addEventListener(
+        "click",
+        copyEmailDraft
+    );
+
+
+document
+    .getElementById(
+        "emailSubject"
+    )
+    .addEventListener(
+        "input",
+        syncEmailDraftState
+    );
+
+
+document
+    .getElementById(
+        "emailBody"
+    )
+    .addEventListener(
+        "input",
+        syncEmailDraftState
+    );
 }
 
 
@@ -440,6 +512,315 @@ async function restartWizard() {
                 block: "start"
             }
         );
+}
+
+
+/* ========================================================
+   LESSON 4A
+   CUSTOMER DETAILS
+   ======================================================== */
+
+
+function saveCustomerDetails() {
+
+    hideCustomerDetailsMessages();
+
+
+    const name =
+        document
+            .getElementById(
+                "customerName"
+            )
+            .value
+            .trim();
+
+
+    const company =
+        document
+            .getElementById(
+                "customerCompany"
+            )
+            .value
+            .trim();
+
+
+    const email =
+        document
+            .getElementById(
+                "customerEmail"
+            )
+            .value
+            .trim();
+
+
+    const phone =
+        document
+            .getElementById(
+                "customerPhone"
+            )
+            .value
+            .trim();
+
+
+    const project =
+        document
+            .getElementById(
+                "customerProject"
+            )
+            .value
+            .trim();
+
+
+    const notes =
+        document
+            .getElementById(
+                "customerNotes"
+            )
+            .value
+            .trim();
+
+
+    if (!name) {
+
+        showCustomerDetailsError(
+            "Enter the customer name."
+        );
+
+        return;
+    }
+
+
+    if (!company) {
+
+        showCustomerDetailsError(
+            "Enter the customer company."
+        );
+
+        return;
+    }
+
+
+    if (!email) {
+
+        showCustomerDetailsError(
+            "Enter the customer email address."
+        );
+
+        return;
+    }
+
+
+    if (!isValidEmailAddress(email)) {
+
+        showCustomerDetailsError(
+            "Enter a valid customer email address."
+        );
+
+        return;
+    }
+
+
+    customerState.name =
+        name;
+
+
+    customerState.company =
+        company;
+
+
+    customerState.email =
+        email;
+
+
+    customerState.phone =
+        phone;
+
+
+    customerState.project =
+        project;
+
+
+    customerState.notes =
+        notes;
+
+
+    showCustomerDetailsStatus(
+        "Customer details saved for this sales session."
+    );
+
+
+    console.log(
+        "Customer session:",
+        customerState
+    );
+	
+	generateFollowUpEmail();
+}
+
+
+function isValidEmailAddress(
+    email
+) {
+
+    return (
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    )
+    .test(
+        email
+    );
+}
+
+
+function showCustomerDetailsError(
+    message
+) {
+
+    const element =
+        document.getElementById(
+            "customerDetailsError"
+        );
+
+
+    element.textContent =
+        message;
+
+
+    element.classList.remove(
+        "hidden"
+    );
+}
+
+
+function showCustomerDetailsStatus(
+    message
+) {
+
+    const element =
+        document.getElementById(
+            "customerDetailsStatus"
+        );
+
+
+    element.textContent =
+        message;
+
+
+    element.classList.remove(
+        "hidden"
+    );
+}
+
+
+function hideCustomerDetailsMessages() {
+
+    const error =
+        document.getElementById(
+            "customerDetailsError"
+        );
+
+
+    const status =
+        document.getElementById(
+            "customerDetailsStatus"
+        );
+
+
+    error.textContent =
+        "";
+
+
+    status.textContent =
+        "";
+
+
+    error.classList.add(
+        "hidden"
+    );
+
+
+    status.classList.add(
+        "hidden"
+    );
+}
+
+function resetCustomerState() {
+
+    customerState.name =
+        "";
+
+
+    customerState.company =
+        "";
+
+
+    customerState.email =
+        "";
+
+
+    customerState.phone =
+        "";
+
+
+    customerState.project =
+        "";
+
+
+    customerState.notes =
+        "";
+}
+
+
+function clearCustomerDetailsForm() {
+
+    document.getElementById(
+        "customerName"
+    ).value = "";
+
+
+    document.getElementById(
+        "customerCompany"
+    ).value = "";
+
+
+    document.getElementById(
+        "customerEmail"
+    ).value = "";
+
+
+    document.getElementById(
+        "customerPhone"
+    ).value = "";
+
+
+    document.getElementById(
+        "customerProject"
+    ).value = "";
+
+
+    document.getElementById(
+        "customerNotes"
+    ).value = "";
+
+
+    hideCustomerDetailsMessages();
+}
+
+
+async function startNewCustomer() {
+
+    resetCustomerState();
+
+
+    clearCustomerDetailsForm();
+
+
+    resetEmailDraftState();
+
+
+    clearEmailComposer();
+
+
+    await restartWizard();
 }
 
 /* ========================================================
@@ -1271,6 +1652,11 @@ function completeWizard(
 	updateSessionStatus();
 
 	updateNavigationButtons();
+	
+	if(customerState.email)
+	{
+		generateFollowUpEmail();
+	}
 }
 
 
@@ -2805,4 +3191,939 @@ function hideWizardError() {
     element.classList.add(
         "hidden"
     );
+}
+
+/* ========================================================
+   LESSON 4B
+   FOLLOW-UP EMAIL GENERATOR
+   ======================================================== */
+
+
+function generateFollowUpEmail() {
+
+    hideEmailDraftMessages();
+
+
+    if (
+        !wizardState.completeResult
+        ||
+        !wizardState.completeResult.lesson3_view
+    ) {
+
+        showEmailDraftError(
+            "Complete the module evaluation before "
+            + "generating the customer email."
+        );
+
+        return;
+    }
+
+
+    if (
+        !customerState.email
+    ) {
+
+        showEmailDraftError(
+            "Save the customer details before "
+            + "generating the email."
+        );
+
+        return;
+    }
+
+
+    const view =
+        wizardState
+            .completeResult
+            .lesson3_view;
+
+
+    const module =
+        view.module || {};
+
+
+    const outcome =
+        view.outcome || {};
+
+
+    const moduleId =
+        module.module_id || "";
+
+
+    const moduleName =
+        module.module_name || "";
+
+
+    const customerName =
+        getCustomerFirstName();
+
+
+    const project =
+        customerState.project
+        ||
+        "your application";
+
+
+    const requirements =
+        buildRequirementEmailLines();
+
+
+    const strengths =
+        cleanEmailList(
+            view.strengths
+        )
+        .slice(
+            0,
+            4
+        );
+
+
+    const clarifications =
+        cleanEmailList(
+            view.clarifications
+        )
+        .slice(
+            0,
+            4
+        );
+
+
+    const subject =
+        buildEmailSubject(
+            moduleId,
+            project
+        );
+
+
+    const body =
+        buildEmailBody(
+            {
+                customerName:
+                    customerName,
+
+                project:
+                    project,
+
+                moduleId:
+                    moduleId,
+
+                moduleName:
+                    moduleName,
+
+                outcome:
+                    outcome,
+
+                requirements:
+                    requirements,
+
+                strengths:
+                    strengths,
+
+                clarifications:
+                    clarifications
+            }
+        );
+
+
+    emailDraftState.recipient =
+        customerState.email;
+
+
+    emailDraftState.subject =
+        subject;
+
+
+    emailDraftState.body =
+        body;
+
+
+    emailDraftState.generated =
+        true;
+
+
+    document
+        .getElementById(
+            "emailRecipient"
+        )
+        .value =
+            emailDraftState.recipient;
+
+
+    document
+        .getElementById(
+            "emailSubject"
+        )
+        .value =
+            emailDraftState.subject;
+
+
+    document
+        .getElementById(
+            "emailBody"
+        )
+        .value =
+            emailDraftState.body;
+
+
+    document
+        .getElementById(
+            "emailComposerPanel"
+        )
+        .classList
+        .remove(
+            "hidden"
+        );
+
+
+    showEmailDraftStatus(
+        "Email draft generated. Review and edit "
+        + "the message before using it."
+    );
+}
+
+function buildEmailSubject(
+    moduleId,
+    project
+) {
+
+    if (
+        moduleId
+    ) {
+
+        return (
+            "Unisem "
+            + moduleId
+            + " Recommendation - "
+            + project
+        );
+    }
+
+
+    return (
+        "Unisem Module Recommendation - "
+        + project
+    );
+}
+
+function getCustomerFirstName() {
+
+    const name =
+        String(
+            customerState.name || ""
+        )
+        .trim();
+
+
+    if (!name) {
+
+        return "Customer";
+    }
+
+
+    return (
+        name
+            .split(
+                /\s+/
+            )[0]
+    );
+}
+
+function buildRequirementEmailLines() {
+
+    if (
+        !Array.isArray(
+            wizardState.displayAnswers
+        )
+    ) {
+
+        return [];
+    }
+
+
+    return (
+        wizardState
+            .displayAnswers
+            .filter(
+                answer =>
+                    answer
+                    &&
+                    answer.question
+                    &&
+                    answer.label
+            )
+            .slice(
+                0,
+                6
+            )
+            .map(
+                answer =>
+                    (
+                        answer.question
+                        + ": "
+                        + answer.label
+                    )
+            )
+    );
+}
+
+function cleanEmailList(
+    items
+) {
+
+    if (
+        !Array.isArray(
+            items
+        )
+    ) {
+
+        return [];
+    }
+
+
+    return (
+        items.filter(
+            item =>
+                item !== null
+                &&
+                item !== undefined
+                &&
+                String(
+                    item
+                ).trim() !== ""
+        )
+        .map(
+            item =>
+                String(
+                    item
+                ).trim()
+        )
+    );
+}
+
+function buildEmailBody(
+    data
+) {
+
+    const lines =
+        [];
+
+
+    lines.push(
+        "Dear "
+        + data.customerName
+        + ","
+    );
+
+
+    lines.push(
+        ""
+    );
+
+
+    lines.push(
+        "Thank you for discussing your "
+        + data.project
+        + " requirement with Unisem Modules."
+    );
+
+
+    lines.push(
+        ""
+    );
+
+
+    addRecommendationParagraph(
+        lines,
+        data
+    );
+
+
+    if (
+        data.requirements.length > 0
+    ) {
+
+        lines.push(
+            ""
+        );
+
+
+        lines.push(
+            "Key requirements discussed:"
+        );
+
+
+        for (
+            const requirement
+            of data.requirements
+        ) {
+
+            lines.push(
+                "• "
+                + requirement
+            );
+        }
+    }
+
+
+    if (
+        data.strengths.length > 0
+    ) {
+
+        lines.push(
+            ""
+        );
+
+
+        lines.push(
+            "Why this module is a good fit:"
+        );
+
+
+        for (
+            const strength
+            of data.strengths
+        ) {
+
+            lines.push(
+                "• "
+                + strength
+            );
+        }
+    }
+
+
+    if (
+        data.clarifications.length > 0
+    ) {
+
+        lines.push(
+            ""
+        );
+
+
+        lines.push(
+            "Before finalising the recommendation, "
+            + "we would like to confirm:"
+        );
+
+
+        for (
+            const clarification
+            of data.clarifications
+        ) {
+
+            lines.push(
+                "• "
+                + clarification
+            );
+        }
+    }
+
+
+    lines.push(
+        ""
+    );
+
+
+    lines.push(
+        "Our team can support you with the relevant "
+        + "technical documentation, evaluation samples "
+        + "and application discussions as required."
+    );
+
+
+    lines.push(
+        ""
+    );
+
+
+    lines.push(
+        "Please let us know if you would like to "
+        + "discuss the recommendation in more detail."
+    );
+
+
+    lines.push(
+        ""
+    );
+
+
+    lines.push(
+        "Regards,"
+    );
+
+
+    lines.push(
+        "Unisem Modules Team"
+    );
+
+
+    return (
+        lines.join(
+            "\n"
+        )
+    );
+}
+
+function addRecommendationParagraph(
+    lines,
+    data
+) {
+
+    const code =
+        String(
+            data.outcome.code || ""
+        )
+        .toLowerCase();
+
+
+    const moduleText =
+        buildModuleEmailName(
+            data.moduleId,
+            data.moduleName
+        );
+
+
+    if (
+        code ===
+        "recommended"
+    ) {
+
+        lines.push(
+            "Based on the requirements discussed, "
+            + "we recommend "
+            + moduleText
+            + " for your evaluation."
+        );
+
+
+        return;
+    }
+
+
+    if (
+        code ===
+        "clarification_required"
+    ) {
+
+        lines.push(
+            "Based on our initial evaluation, "
+            + moduleText
+            + " appears to be a suitable candidate "
+            + "for your application, subject to a few "
+            + "technical clarifications."
+        );
+
+
+        return;
+    }
+
+
+    if (
+        data.moduleId
+    ) {
+
+        lines.push(
+            "We have completed an initial review of "
+            + "your requirements. "
+            + moduleText
+            + " was evaluated as part of this review, "
+            + "and we recommend further discussion "
+            + "before final module selection."
+        );
+
+
+        return;
+    }
+
+
+    lines.push(
+        "We have completed an initial review of your "
+        + "requirements and recommend further technical "
+        + "discussion before selecting the module."
+    );
+}
+
+function addRecommendationParagraph(
+    lines,
+    data
+) {
+
+    const code =
+        String(
+            data.outcome.code || ""
+        )
+        .toLowerCase();
+
+
+    const moduleText =
+        buildModuleEmailName(
+            data.moduleId,
+            data.moduleName
+        );
+
+
+    if (
+        code ===
+        "recommended"
+    ) {
+
+        lines.push(
+            "Based on the requirements discussed, "
+            + "we recommend "
+            + moduleText
+            + " for your evaluation."
+        );
+
+
+        return;
+    }
+
+
+    if (
+        code ===
+        "clarification_required"
+    ) {
+
+        lines.push(
+            "Based on our initial evaluation, "
+            + moduleText
+            + " appears to be a suitable candidate "
+            + "for your application, subject to a few "
+            + "technical clarifications."
+        );
+
+
+        return;
+    }
+
+
+    if (
+        data.moduleId
+    ) {
+
+        lines.push(
+            "We have completed an initial review of "
+            + "your requirements. "
+            + moduleText
+            + " was evaluated as part of this review, "
+            + "and we recommend further discussion "
+            + "before final module selection."
+        );
+
+
+        return;
+    }
+
+
+    lines.push(
+        "We have completed an initial review of your "
+        + "requirements and recommend further technical "
+        + "discussion before selecting the module."
+    );
+}
+
+function buildModuleEmailName(
+    moduleId,
+    moduleName
+) {
+
+    if (
+        moduleId
+        &&
+        moduleName
+    ) {
+
+        return (
+            "the Unisem "
+            + moduleId
+            + " ("
+            + moduleName
+            + ")"
+        );
+    }
+
+
+    if (
+        moduleId
+    ) {
+
+        return (
+            "the Unisem "
+            + moduleId
+        );
+    }
+
+
+    return (
+        "an appropriate Unisem module"
+    );
+}
+
+function syncEmailDraftState() {
+
+    emailDraftState.recipient =
+        document
+            .getElementById(
+                "emailRecipient"
+            )
+            .value
+            .trim();
+
+
+    emailDraftState.subject =
+        document
+            .getElementById(
+                "emailSubject"
+            )
+            .value;
+
+
+    emailDraftState.body =
+        document
+            .getElementById(
+                "emailBody"
+            )
+            .value;
+}
+
+async function copyEmailDraft() {
+
+    hideEmailDraftMessages();
+
+
+    syncEmailDraftState();
+
+
+    if (
+        !emailDraftState.generated
+    ) {
+
+        showEmailDraftError(
+            "Generate the email before copying it."
+        );
+
+        return;
+    }
+
+
+    const emailText =
+        (
+            "To: "
+            + emailDraftState.recipient
+            + "\n"
+            + "Subject: "
+            + emailDraftState.subject
+            + "\n\n"
+            + emailDraftState.body
+        );
+
+
+    try {
+
+        if (
+            navigator.clipboard
+            &&
+            navigator.clipboard.writeText
+        ) {
+
+            await navigator
+                .clipboard
+                .writeText(
+                    emailText
+                );
+
+        } else {
+
+            copyTextFallback(
+                emailText
+            );
+        }
+
+
+        showEmailDraftStatus(
+            "Email copied to clipboard."
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Copy email error:",
+            error
+        );
+
+
+        showEmailDraftError(
+            "Unable to copy the email automatically."
+        );
+    }
+}
+
+function copyTextFallback(
+    text
+) {
+
+    const textarea =
+        document.createElement(
+            "textarea"
+        );
+
+
+    textarea.value =
+        text;
+
+
+    textarea.style.position =
+        "fixed";
+
+
+    textarea.style.opacity =
+        "0";
+
+
+    document.body.appendChild(
+        textarea
+    );
+
+
+    textarea.select();
+
+
+    document.execCommand(
+        "copy"
+    );
+
+
+    textarea.remove();
+}
+
+function showEmailDraftError(
+    message
+) {
+
+    const element =
+        document.getElementById(
+            "emailDraftError"
+        );
+
+
+    element.textContent =
+        message;
+
+
+    element.classList.remove(
+        "hidden"
+    );
+}
+
+
+function showEmailDraftStatus(
+    message
+) {
+
+    const element =
+        document.getElementById(
+            "emailDraftStatus"
+        );
+
+
+    element.textContent =
+        message;
+
+
+    element.classList.remove(
+        "hidden"
+    );
+}
+
+
+function hideEmailDraftMessages() {
+
+    const error =
+        document.getElementById(
+            "emailDraftError"
+        );
+
+
+    const status =
+        document.getElementById(
+            "emailDraftStatus"
+        );
+
+
+    error.textContent =
+        "";
+
+
+    status.textContent =
+        "";
+
+
+    error.classList.add(
+        "hidden"
+    );
+
+
+    status.classList.add(
+        "hidden"
+    );
+}
+
+function resetEmailDraftState() {
+
+    emailDraftState.recipient =
+        "";
+
+
+    emailDraftState.subject =
+        "";
+
+
+    emailDraftState.body =
+        "";
+
+
+    emailDraftState.generated =
+        false;
+}
+
+function clearEmailComposer() {
+
+    document
+        .getElementById(
+            "emailRecipient"
+        )
+        .value =
+            "";
+
+
+    document
+        .getElementById(
+            "emailSubject"
+        )
+        .value =
+            "";
+
+
+    document
+        .getElementById(
+            "emailBody"
+        )
+        .value =
+            "";
+
+
+    document
+        .getElementById(
+            "emailComposerPanel"
+        )
+        .classList
+        .add(
+            "hidden"
+        );
+
+
+    hideEmailDraftMessages();
 }

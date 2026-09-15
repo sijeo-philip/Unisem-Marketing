@@ -230,6 +230,281 @@
 </table>
 </div>
 </section>
+
+<!-- =====================================================
+     LESSON 4A
+     CUSTOMER DETAILS
+     ===================================================== -->
+
+<section
+    id="customerDetailsPanel"
+    class="customer-details-panel"
+>
+
+    <div class="customer-details-header">
+
+        <div>
+
+            <p class="result-eyebrow">
+                CUSTOMER FOLLOW-UP
+            </p>
+
+            <h3>
+                Customer Details
+            </h3>
+
+            <p class="customer-details-description">
+                Capture the customer information that will
+                be used for the follow-up email and
+                document sharing.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="customer-form-grid">
+
+        <div class="customer-field">
+
+            <label for="customerName">
+                Customer Name *
+            </label>
+
+            <input
+                id="customerName"
+                type="text"
+                autocomplete="name"
+                placeholder="Customer contact name"
+            >
+
+        </div>
+
+
+        <div class="customer-field">
+
+            <label for="customerCompany">
+                Company *
+            </label>
+
+            <input
+                id="customerCompany"
+                type="text"
+                autocomplete="organization"
+                placeholder="Company / organisation"
+            >
+
+        </div>
+
+
+        <div class="customer-field">
+
+            <label for="customerEmail">
+                Email *
+            </label>
+
+            <input
+                id="customerEmail"
+                type="email"
+                autocomplete="email"
+                placeholder="customer@company.com"
+            >
+
+        </div>
+
+
+        <div class="customer-field">
+
+            <label for="customerPhone">
+                Phone
+            </label>
+
+            <input
+                id="customerPhone"
+                type="tel"
+                autocomplete="tel"
+                placeholder="Phone number"
+            >
+
+        </div>
+
+
+        <div class="customer-field customer-field-wide">
+
+            <label for="customerProject">
+                Project / Application
+            </label>
+
+            <input
+                id="customerProject"
+                type="text"
+                placeholder="Example: Smart Meter"
+            >
+
+        </div>
+
+
+        <div class="customer-field customer-field-wide">
+
+            <label for="customerNotes">
+                Sales Notes
+            </label>
+
+            <textarea
+                id="customerNotes"
+                rows="4"
+                placeholder="Important discussion points,
+volume expectations, timelines or other notes"
+            ></textarea>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="customerDetailsError"
+        class="wizard-error hidden"
+    >
+    </div>
+
+
+    <div
+        id="customerDetailsStatus"
+        class="customer-details-status hidden"
+    >
+    </div>
+
+
+    <div class="customer-details-actions">
+
+        <button
+            id="saveCustomerDetailsButton"
+            class="primary-button"
+            type="button"
+        >
+            Save Customer Details
+        </button>
+
+    </div>
+
+</section>
+
+<!-- =====================================================
+     LESSON 4B
+     CUSTOMER EMAIL DRAFT
+     ===================================================== -->
+
+<section
+    id="emailComposerPanel"
+    class="email-composer-panel hidden"
+>
+
+    <div class="email-composer-header">
+
+        <div>
+
+            <p class="result-eyebrow">
+                CUSTOMER COMMUNICATION
+            </p>
+
+            <h3>
+                Follow-up Email
+            </h3>
+
+            <p class="email-composer-description">
+                The draft below was generated from the
+                customer requirements and module
+                recommendation. Review and edit it before
+                sending.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="email-field">
+
+        <label for="emailRecipient">
+            To
+        </label>
+
+        <input
+            id="emailRecipient"
+            type="email"
+            readonly
+        >
+
+    </div>
+
+
+    <div class="email-field">
+
+        <label for="emailSubject">
+            Subject
+        </label>
+
+        <input
+            id="emailSubject"
+            type="text"
+        >
+
+    </div>
+
+
+    <div class="email-field">
+
+        <label for="emailBody">
+            Email Message
+        </label>
+
+        <textarea
+            id="emailBody"
+            rows="18"
+        ></textarea>
+
+    </div>
+
+
+    <div
+        id="emailDraftError"
+        class="wizard-error hidden"
+    >
+    </div>
+
+
+    <div
+        id="emailDraftStatus"
+        class="customer-details-status hidden"
+    >
+    </div>
+
+
+    <div class="email-composer-actions">
+
+        <button
+            id="regenerateEmailButton"
+            class="secondary-button"
+            type="button"
+        >
+            Regenerate Email
+        </button>
+
+
+        <button
+            id="copyEmailButton"
+            class="primary-button"
+            type="button"
+        >
+            Copy Email
+        </button>
+
+    </div>
+
+</section>
+
 <div class="completion-actions" id="completionActions">
 <button class="secondary-button" id="changeAnswersButton" type="button">
         ← Change Last Answer
